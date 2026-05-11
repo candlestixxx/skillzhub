@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { generateDownloadUrl } from "@/lib/storage"
-import bcrypt from "bcryptjs"
+import crypto from "crypto"
 
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -14,14 +14,17 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const rawKey = authHeader.split(' ')[1];
 
-        const allKeys = await prisma.aPIKey.findMany({ select: { id: true, company_id: true, hashed_key: true }});
-        for (const k of allKeys) {
-            if (await bcrypt.compare(rawKey, k.hashed_key)) {
-                companyId = k.company_id;
-                // Update last used timestamp
-                await prisma.aPIKey.update({ where: { id: k.id }, data: { last_used_at: new Date() }});
-                break;
-            }
+        // Hash the provided key using SHA-256 for fast O(1) lookup
+        const hashedKey = crypto.createHash('sha256').update(rawKey).digest('hex')
+
+        const apiKeyRecord = await prisma.aPIKey.findFirst({
+            where: { hashed_key: hashedKey, status: 'ACTIVE' }
+        });
+
+        if (apiKeyRecord) {
+            companyId = apiKeyRecord.company_id;
+            // Update last used timestamp
+            await prisma.aPIKey.update({ where: { id: apiKeyRecord.id }, data: { last_used_at: new Date() }});
         }
     }
 

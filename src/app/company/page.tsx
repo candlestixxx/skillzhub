@@ -1,9 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function CompanyDashboard() {
-  const router = useRouter()
   const [datasets, setDatasets] = useState([])
   const [missions, setMissions] = useState([])
   const [apiKeys, setApiKeys] = useState([])
@@ -19,7 +18,6 @@ export default function CompanyDashboard() {
     setLoading(true)
     try {
       const res = await fetch('/api/v1/company/datasets')
-      if (res.status === 401 || res.status === 403) router.push('/api/auth/signin')
       if (res.ok) setDatasets(await res.json())
     } catch (e) {}
     setLoading(false)
@@ -28,7 +26,6 @@ export default function CompanyDashboard() {
   const fetchMissions = async () => {
     try {
       const res = await fetch('/api/v1/missions')
-      if (res.status === 401 || res.status === 403) router.push('/api/auth/signin')
       if (res.ok) setMissions(await res.json())
     } catch (e) {}
   }
@@ -36,7 +33,6 @@ export default function CompanyDashboard() {
   const fetchApiKeys = async () => {
     try {
       const res = await fetch('/api/v1/company/api-keys')
-      if (res.status === 401 || res.status === 403) router.push('/api/auth/signin')
       if (res.ok) setApiKeys(await res.json())
     } catch (e) {}
   }
@@ -92,10 +88,38 @@ export default function CompanyDashboard() {
       } catch (e) {}
   }
 
+  // Analytics preparation
+  const chartData = datasets.map((d: any) => ({
+      name: d.title.substring(0, 15) + '...',
+      duration: d.total_duration_seconds
+  }));
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-2">Company Dashboard</h1>
       <p className="text-gray-600 mb-8">Manage your data acquisition pipeline, datasets, and API access.</p>
+
+      {/* Analytics Section */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Dataset Volumes (Seconds)</h2>
+          <div className="h-64 w-full">
+            {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="duration" fill="#8884d8" name="Duration (s)" />
+                    </BarChart>
+                </ResponsiveContainer>
+            ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 italic border-dashed border-2 border-gray-200 rounded">
+                    No data to chart yet. Accept submissions to build datasets.
+                </div>
+            )}
+          </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>

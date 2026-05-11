@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { Role } from "@prisma/client"
 import { rateLimit } from "@/lib/rate-limit"
+import { RegisterSchema } from "@/lib/schemas"
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,11 +14,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Too many registration attempts. Please try again later." }, { status: 429 })
     }
 
-    const { name, email, password } = await req.json()
+    const body = await req.json()
+    const validated = RegisterSchema.safeParse(body)
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+    if (!validated.success) {
+        return NextResponse.json({ error: "Validation failed", details: validated.error.format() }, { status: 400 })
     }
+
+    const { name, email, password } = validated.data
 
     const existingUser = await prisma.user.findUnique({
       where: { email }

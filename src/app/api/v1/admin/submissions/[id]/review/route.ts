@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { processPayouts } from "@/lib/payments"
+import { ReviewSchema } from "@/lib/schemas"
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -11,11 +12,14 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const { status, accepted_minutes, rejection_reason } = await req.json()
+    const body = await req.json()
+    const validated = ReviewSchema.safeParse(body)
 
-    if (status !== 'ACCEPTED' && status !== 'REJECTED') {
-        return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+    if (!validated.success) {
+        return NextResponse.json({ error: "Validation failed", details: validated.error.format() }, { status: 400 })
     }
+
+    const { status, accepted_minutes, rejection_reason } = validated.data
 
     const submission = await prisma.submission.findUnique({
         where: { id: params.id },

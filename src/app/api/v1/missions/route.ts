@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { MissionSchema } from "@/lib/schemas"
 
 export async function GET(req: Request) {
   try {
@@ -11,12 +12,10 @@ export async function GET(req: Request) {
 
     let whereClause: any = {}
 
-    // If query requires specific status, add it
     if (status) {
       whereClause.status = status;
     }
 
-    // Security boundary: companies should only see their own missions in the dashboard
     if (session?.user?.role === 'COMPANY') {
         whereClause.company_id = session.user.id;
     }
@@ -40,10 +39,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const data = await req.json()
+    const body = await req.json()
+    const validated = MissionSchema.safeParse(body)
+
+    if (!validated.success) {
+        return NextResponse.json({ error: "Validation failed", details: validated.error.format() }, { status: 400 })
+    }
+
     const mission = await prisma.mission.create({
       data: {
-        ...data,
+        ...validated.data,
         company_id: session.user.id
       }
     })

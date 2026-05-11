@@ -24,18 +24,21 @@ export async function rateLimit(identifier: string, limit: number, windowSec: nu
         const client = getRedisClient();
         const key = `ratelimit:${identifier}`;
 
-        const current = await client.get(key);
+        // Use a Lua script for atomic get-and-increment to avoid race conditions
+        const script = `
+            local current = redis.call("INCR", KEYS[1])
+            if current == 1 then
+                redis.call("EXPIRE", KEYS[1], ARGV[1])
+            end
+            return current
+        `;
 
-        if (current && parseInt(current, 10) >= limit) {
+        const result = await client.eval(script, 1, key, windowSec);
+
+        // If current hits limit, block
+        if (result && parseInt(result as string, 10) > limit) {
             return false; // Rate limit exceeded
         }
-
-        const multi = client.multi();
-        multi.incr(key);
-        if (!current) {
-            multi.expire(key, windowSec);
-        }
-        await multi.exec();
 
         return true;
     } catch (error) {
