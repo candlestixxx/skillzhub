@@ -1,11 +1,11 @@
 # Changelog
 
-## [0.1.0] - 2026-05-09
-### Added
-- Initial Next.js setup with Tailwind CSS.
-- Prisma schema with Neon Postgres database integration.
-- Custom authentication and RBAC with NextAuth.
-- API endpoints for missions, submissions, datasets, and API keys.
-- BullMQ worker for simulated video processing.
-- Basic mock payment ledger logic.
-- Foundational documentation (VISION, ROADMAP, TODO, HANDOFF, AGENTS, CHANGELOG).
+## v0.1.1
+- Restructured global project documentation (VISION, ROADMAP, IDEAS, TODO, MEMORY, DEPLOY).
+- Defined Agent instructions across all major LLM profiles.
+- Integrated `VERSION` file display into the global layout footer.
+- Mapped mocked integrations to prepare for Phase 3 development.
+
+## v0.1.0
+- Initial MVP Launch.
+- Set up DB, Queues, RBAC, API routes, and rate-limiting.

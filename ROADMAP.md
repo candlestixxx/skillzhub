@@ -1,28 +1,29 @@
-# Roadmap
+# SkillzHub - Development Roadmap
 
-## Phase 1 (MVP - Completed)
-- Next.js scaffolding and database setup (Postgres + Prisma).
-- Core auth and RBAC (Creator, Company, Admin).
-- Mission and Submission CRUD APIs.
+## Phase 1: Foundations & MVP Core (Completed)
+- [x] Next.js 16 setup with App Router and Tailwind CSS
+- [x] Prisma ORM and Postgres database schema
+- [x] RBAC Authentication (NextAuth) for Creator, Company, Admin
+- [x] Background job processing structure (BullMQ + Redis)
+- [x] Rate Limiting (Redis Token Bucket)
+- [x] Basic Test Coverage (Vitest for API routes)
 
-## Phase 2 (Core UI - Completed)
-- Basic role-based dashboards mapped to route handlers.
+## Phase 2: Core Platform Loops (Completed)
+- [x] Mission Creation & Management API + UI (Company)
+- [x] Submission Upload Flow & Queuing (Creator)
+- [x] Admin Review Queue & QC Overrides (Admin)
+- [x] Dataset auto-generation from accepted submissions
+- [x] Dataset Manifest generation API
+- [x] API Key generation and fast matching (SHA-256)
 
-## Phase 3 (Pipeline - Completed)
-- BullMQ worker for async background tasks.
-- Simulated ffmpeg normalization and VLM auto-labeling.
+## Phase 3: Infrastructure Integration (Upcoming)
+- [ ] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/storage.ts` (currently mocked).
+- [ ] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/payments.ts` and API routes (currently mocked).
+- [ ] Connect BullMQ `worker.ts` to real FFmpeg subprocesses for video normalization.
+- [ ] Integrate a real Vision-Language Model (VLM) (e.g., Gemini Flash or Qwen-VL) into the worker for auto-labeling (action summary, object tags).
 
-## Phase 4 (Datasets & Access - Completed)
-- API key generation.
-- Manifest generation for downloaded datasets.
-
-## Phase 5 (Payments & Docs - Completed)
-- Mock payment ledger implementation.
-- Documentation mapping.
-
-## Next Steps / Future Roadmap
-- Implement real Stripe Connect for creator payouts.
-- Hook up actual FFmpeg and object detection/VLM models (e.g., GroundingDINO, Gemini 2.0 Flash) in the worker.
-- Replace mock S3 signed URLs with AWS/Wasabi/Backblaze SDKs.
-- Expand the frontend UI to include actual video players, charts, and form validations.
-- Develop the "synthetic augmentation" upsell feature (depth maps, segmentation).
+## Phase 4: Polish, UI, and E2E Tests
+- [ ] Add Playwright for end-to-end user flow testing.
+- [ ] Build out real video playback interfaces for the Creator dashboard.
+- [ ] Improve Dataset Analytics dashboard with deeper aggregations.
+- [ ] OpenAPI / Swagger documentation generation for `/api/v1/*`.
