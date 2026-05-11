@@ -1,7 +1,7 @@
 # TODO List
 
 ### High Priority
-- [ ] Replace `https://mock-storage.com` mocks in `src/app/api/v1/datasets/[id]/manifest/route.ts` and `init-upload` route with real S3 Signed URL generation.
+- [x] Replace `https://mock-storage.com` mocks in `src/app/api/v1/datasets/[id]/manifest/route.ts` and `init-upload` route with real S3 Signed URL generation.
 - [ ] Replace Stripe Connect onboarding and transfer mocks in `src/lib/payments.ts` and `src/app/api/v1/creator/onboarding/route.ts`.
 - [ ] Write a Dockerfile specifically for running `worker.ts` independently of the Next.js web process for cloud deployments.
 

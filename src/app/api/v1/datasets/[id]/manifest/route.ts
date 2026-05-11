@@ -56,13 +56,9 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     }
 
     const samples = await Promise.all(dataset.dataset_samples.map(async (ds) => {
-        let videoUrl = `https://mock-storage.com/download/${ds.submission.normalized_storage_key}`;
+        let videoUrl = null;
         if (ds.submission.normalized_storage_key) {
-           try {
-             videoUrl = await generateDownloadUrl(ds.submission.normalized_storage_key);
-           } catch(e) {
-             console.warn("Using mock download URL, S3 credentials likely missing");
-           }
+           videoUrl = await generateDownloadUrl(ds.submission.normalized_storage_key);
         }
 
         return {

@@ -25,12 +25,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
 
     const storageKey = `submissions/${params.id}/${session.user.id}/${Date.now()}.mp4`
 
-    let signedUrl = `https://mock-storage.com/upload?key=${storageKey}`;
-    try {
-        signedUrl = await generateUploadUrl(storageKey);
-    } catch(e) {
-        console.warn("Using mock upload URL, S3 credentials likely missing");
-    }
+    const signedUrl = await generateUploadUrl(storageKey);
 
     const submission = await prisma.submission.create({
       data: {
