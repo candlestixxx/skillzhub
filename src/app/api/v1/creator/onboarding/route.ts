@@ -3,9 +3,15 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
-  apiVersion: '2025-01-27.acacia'
-})
+let stripeClient: Stripe | null = null;
+function getStripe() {
+    if (!stripeClient && process.env.STRIPE_SECRET_KEY) {
+        stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+            apiVersion: '2025-01-27.acacia'
+        });
+    }
+    return stripeClient;
+}
 
 export async function POST(req: Request) {
   try {
@@ -14,18 +20,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
+    const stripe = getStripe();
+    if (!stripe) {
+        console.warn("STRIPE_SECRET_KEY not set, skipping real Stripe call");
+        return NextResponse.json({ error: "Stripe configuration missing" }, { status: 500 })
+    }
+
     const user = await prisma.user.findUnique({ where: { id: session.user.id } })
 
-    // Simulate generating a Stripe Connect onboarding link
     let accountId = user?.payout_account_id
 
+    // If the user doesn't have a Stripe Connect account yet, create one
     if (!accountId) {
-      if (process.env.STRIPE_SECRET_KEY) {
-         const account = await stripe.accounts.create({ type: 'express' })
-         accountId = account.id
-      } else {
-         accountId = `acct_mock_${Date.now()}` // Mock fallback
-      }
+      const account = await stripe.accounts.create({
+          type: 'express',
+          email: user?.email || undefined
+      })
+      accountId = account.id
 
       await prisma.user.update({
           where: { id: session.user.id },
@@ -33,10 +44,19 @@ export async function POST(req: Request) {
       })
     }
 
-    const mockOnboardingUrl = `https://connect.stripe.com/express/setup/mock-link-for-${accountId}`
+    // Generate the onboarding link
+    // Requires a valid NEXTAUTH_URL or base URL to redirect back to
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const accountLink = await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url: `${baseUrl}/creator`,
+      return_url: `${baseUrl}/creator`,
+      type: 'account_onboarding',
+    });
 
-    return NextResponse.json({ url: mockOnboardingUrl })
+    return NextResponse.json({ url: accountLink.url })
   } catch (error) {
+    console.error("Stripe Onboarding Error:", error)
     return NextResponse.json({ error: "Failed to generate onboarding link" }, { status: 500 })
   }
 }

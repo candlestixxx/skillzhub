@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.3
+- Replaced mocked Stripe integrations with the official Stripe Node.js SDK.
+- The `src/app/api/v1/creator/onboarding/route.ts` now uses `stripe.accountLinks.create` for real Connect Express onboarding.
+- The `processPayouts` utility in `src/lib/payments.ts` now triggers real transfers to connected accounts via `stripe.transfers.create`, handling cents conversion and error states.
+
 ## v0.1.2
 - Integrated `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner`.
 - Removed mocked local URLs (`mock-storage.com`) from upload and dataset manifest routes.
