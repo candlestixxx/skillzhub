@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.6
+- Implemented `Dockerfile.worker` to allow the BullMQ video processor to be deployed and scaled independently of the Next.js web application.
+- Added `/api/v1/admin/submissions/[id]/video` route to securely issue presigned S3 URLs to administrators for raw submission reviews.
+- Enhanced the `AdminDashboard` UI by replacing placeholder blocks with live `<video>` elements that dynamically fetch these secure presigned URLs.
+
 ## v0.1.5
 - Integrated `swagger-jsdoc` and `swagger-ui-react`.
 - Added JSDoc OpenAPI annotations to `/api/v1/missions` and `/api/v1/datasets/[id]/manifest` routes.

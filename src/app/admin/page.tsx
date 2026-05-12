@@ -2,6 +2,41 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
+// Extracted Video Component to handle independent fetching of presigned URLs
+function AdminVideoPlayer({ submissionId }: { submissionId: string }) {
+    const [url, setUrl] = useState<string | null>(null)
+    const [error, setError] = useState(false)
+
+    useEffect(() => {
+        async function fetchUrl() {
+            try {
+                const res = await fetch(`/api/v1/admin/submissions/${submissionId}/video`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setUrl(data.url)
+                } else {
+                    setError(true)
+                }
+            } catch (e) {
+                setError(true)
+            }
+        }
+        fetchUrl()
+    }, [submissionId])
+
+    if (error) {
+        return <span className="text-white text-sm">Video Preview Error</span>
+    }
+
+    if (!url) {
+        return <span className="text-white text-sm animate-pulse">Loading Video...</span>
+    }
+
+    return (
+        <video src={url} controls className="w-full h-full object-cover" />
+    )
+}
+
 export default function AdminDashboard() {
   const router = useRouter()
   const [queue, setQueue] = useState([])
@@ -54,10 +89,8 @@ export default function AdminDashboard() {
             <ul className="space-y-4">
               {queue.map((s: any) => (
                 <li key={s.id} className="bg-white p-4 rounded shadow flex flex-col md:flex-row gap-6">
-                   {/* Mock Video Player */}
                    <div className="w-full md:w-1/3 bg-black flex items-center justify-center rounded overflow-hidden aspect-video">
-                       <span className="text-white text-sm">Video Preview Unavailable</span>
-                       {/* In a real scenario, use: <video src={`/api/v1/submissions/${s.id}/stream`} controls className="w-full h-full object-cover" /> */}
+                       <AdminVideoPlayer submissionId={s.id} />
                    </div>
 
                    <div className="w-full md:w-2/3">
