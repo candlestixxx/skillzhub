@@ -11,4 +11,4 @@
 - [x] Replace placeholder videos in the Admin review UI with actual presigned URLs pointing to the raw storage bucket.
 
 ### Low Priority
-- [ ] Expand Vitest test suite to cover all Prisma schemas and background worker logic.
+- [x] Expand Vitest test suite to cover all Prisma schemas and background worker logic.

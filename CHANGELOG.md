@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.7
+- Refactored `worker.ts` FFprobe extraction logic into a pure, testable utility (`src/lib/video-processor.ts`).
+- Expanded the Vitest suite with unit tests verifying FFprobe metadata extraction (resolution, duration, fps).
+- Completed the final remaining low-priority task from the MVP roadmap.
+
 ## v0.1.6
 - Implemented `Dockerfile.worker` to allow the BullMQ video processor to be deployed and scaled independently of the Next.js web application.
 - Added `/api/v1/admin/submissions/[id]/video` route to securely issue presigned S3 URLs to administrators for raw submission reviews.
