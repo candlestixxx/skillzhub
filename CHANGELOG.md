@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.13
+- Resolved merge conflicts with `main` while preserving the feature branch’s latest webhook, analytics, and creator/company dashboard work.
+- Integrated non-conflicting files from `main` required for a clean merge state.
+
 ## v0.1.12
 - Added `webhook_url` and `webhook_secret` fields to the `Mission` Prisma schema.
 - Built a secure `dispatchWebhook` service that signs POST payloads with SHA-256 HMAC for company verification.
