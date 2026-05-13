@@ -36,3 +36,6 @@
 - [x] Replaced generic video placeholders in the Admin QC UI with authorized AWS S3 presigned URLs.
 - [x] Refactored background worker logic into testable utilities (`src/lib/video-processor.ts`).
 - [x] Expanded Vitest test suite to cover worker pure functions.
+
+## Phase 7: Product Gamification
+- [x] Implemented "Creator Tiers" mechanism. Tier 2+ creators bypass manual Admin QC entirely and automatically trigger dataset generation and payouts.

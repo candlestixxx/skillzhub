@@ -3,6 +3,7 @@ import Redis from 'ioredis'
 import { PrismaClient } from '@prisma/client'
 import { probeVideo, extractMetadata } from './src/lib/video-processor'
 import { generateVideoLabels } from './src/lib/services/vlm-processor'
+import { acceptSubmissionAndTriggerDownstream } from './src/lib/services/submissions'
 
 const prisma = new PrismaClient()
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
@@ -14,6 +15,13 @@ const worker = new Worker('video-processing', async job => {
   console.log(`Processing submission ${submissionId}`)
 
   try {
+    const submission = await prisma.submission.findUnique({
+        where: { id: submissionId },
+        include: { creator: true }
+    });
+
+    if (!submission) throw new Error("Submission not found in worker");
+
     let duration = 120;
     let width = 1920;
     let height = 1080;
@@ -37,7 +45,7 @@ const worker = new Worker('video-processing', async job => {
         console.warn("ffprobe failed (is the URL accessible?), falling back to mock metadata.", probeError);
     }
 
-    const isQCPass = width >= 1920 && fps >= 30
+    const isQCPass = width >= 1920 && fps >= 30;
 
     let labels = await generateVideoLabels(rawStorageKey);
     if (!labels) {
@@ -47,11 +55,13 @@ const worker = new Worker('video-processing', async job => {
             environment: ["indoor", "cluttered"]
         }
     }
-        action_summary: "Person walks into garage and picks up power drill",
-        objects: ["garage", "drill", "hand"],
-        environment: ["indoor", "cluttered"]
-    }
 
+    // Determine target status.
+    // If the video passes QC and the creator is Tier 2 or above, bypass manual review and accept immediately.
+    const shouldBypassQC = isQCPass && (submission.creator.trust_tier >= 2);
+    const targetStatus = shouldBypassQC ? 'ACCEPTED' : (isQCPass ? 'IN_REVIEW' : 'AUTO_QC_FAIL');
+
+    // First update the core metadata
     await prisma.submission.update({
         where: { id: submissionId },
         data: {
@@ -59,12 +69,18 @@ const worker = new Worker('video-processing', async job => {
             resolution_width: width,
             resolution_height: height,
             fps: fps,
-            processing_status: isQCPass ? 'IN_REVIEW' : 'AUTO_QC_FAIL',
+            processing_status: targetStatus,
             auto_qc_report: { passed: isQCPass, checks: { resolution: true, fps: true } },
             labels_summary: labels as any,
             normalized_storage_key: rawStorageKey
         }
     })
+
+    // If auto-accepted due to high trust tier, trigger the downstream effects (Payouts, Datasets, Webhooks)
+    if (shouldBypassQC) {
+        console.log(`Creator ${submission.creator.id} is Tier ${submission.creator.trust_tier}. Auto-accepting submission.`);
+        await acceptSubmissionAndTriggerDownstream(submissionId, duration / 60, duration);
+    }
 
     console.log(`Finished processing ${submissionId}`)
   } catch (error) {

@@ -19,6 +19,7 @@ export async function GET() {
         role: true,
         kyc_status: true,
         payout_account_id: true,
+        trust_tier: true,
         created_at: true,
         updated_at: true
       }

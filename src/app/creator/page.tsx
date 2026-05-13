@@ -123,7 +123,16 @@ export default function CreatorDashboard() {
       {/* Header Profile Section */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Creator Dashboard</h1>
+            <div className="flex items-center gap-3">
+               <h1 className="text-3xl font-bold text-gray-900">Creator Dashboard</h1>
+               {profile && (
+                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border ${
+                       profile.trust_tier >= 2 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-gray-100 text-gray-600 border-gray-200'
+                   }`}>
+                       Tier {profile.trust_tier}
+                   </span>
+               )}
+            </div>
             <p className="text-gray-600 mt-1">Welcome back, {profile?.name || 'Creator'}</p>
           </div>
           <div>

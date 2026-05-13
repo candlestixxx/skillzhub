@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.15
+- Implemented **Creator Trust Tiers**.
+- Updated Prisma schema to include a `trust_tier` field on the `User` model.
+- Refactored `worker.ts` and `src/app/api/v1/admin/submissions/[id]/review/route.ts` to share the `acceptSubmissionAndTriggerDownstream` logic.
+- The BullMQ worker now automatically accepts submissions that pass auto-QC if the uploading Creator is Tier 2 or higher, completely bypassing the manual Admin review queue and immediately triggering dataset generation, webhooks, and payouts.
+- Updated the Creator Dashboard UI to proudly display the user's current Trust Tier.
+
 ## v0.1.14
 - Implemented fast, fail-open Edge Middleware validation in `src/middleware.ts` to immediately block malformed API keys before hitting the Node.js event loop or Database connections.
 - Added comprehensive React Error Boundaries (`src/app/error.tsx` and `src/app/global-error.tsx`) to catch unhandled runtime crashes gracefully, providing the user with recovery options rather than a raw server stack trace.
