@@ -4,10 +4,6 @@ import { NextResponse } from "next/server"
 export default auth((req) => {
   const { nextUrl } = req
 
-  if (nextUrl.pathname.startsWith('/api/v1/') && !req.auth?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
   if (nextUrl.pathname.startsWith('/api/v1/admin') && req.auth?.user?.role !== 'ADMIN') {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }

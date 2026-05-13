@@ -1,19 +1,5 @@
 # Changelog
 
-## v0.1.14
-- Fixed API key auth status mismatch in dataset manifest lookups and added attachment headers for manifest downloads.
-- Hardened mission update/create validation and removed webhook secret exposure from mission API responses.
-- Secured admin review acceptance flow with transaction boundaries and atomic dataset duration increments.
-- Added upload existence verification before queueing processing jobs and replaced queue proxy access with explicit getter usage.
-- Improved security and reliability: webhook SSRF blocking, safer registration IP resolution, Redis error logging, and shared Stripe client initialization.
-- Removed `ignoreBuildErrors` from Next.js config and updated outdated dependency documentation in `LIBRARIES.md`.
-
-## v0.1.13
-- Resolved merge conflicts with `main` while preserving the feature branch’s latest webhook, analytics, and creator/company dashboard work.
-- Integrated non-conflicting files from `main` required for a clean merge state.
-- Removed duplicate legacy `src/lib/{storage,queue,payments}.ts` files to keep the active `src/lib/services/*` architecture consistent.
-- Removed duplicate root AI-instruction files to retain `docs/agents/*` as the single source of truth.
-
 ## v0.1.12
 - Added `webhook_url` and `webhook_secret` fields to the `Mission` Prisma schema.
 - Built a secure `dispatchWebhook` service that signs POST payloads with SHA-256 HMAC for company verification.

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         const hashedKey = crypto.createHash('sha256').update(rawKey).digest('hex')
 
         const apiKeyRecord = await prisma.aPIKey.findFirst({
-            where: { hashed_key: hashedKey, status: { in: ['active', 'ACTIVE'] } }
+            where: { hashed_key: hashedKey, status: 'ACTIVE' }
         });
 
         if (apiKeyRecord) {
@@ -103,11 +103,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         samples
     }
 
-    return NextResponse.json(manifest, {
-      headers: {
-        "Content-Disposition": `attachment; filename="dataset-${dataset.id}-manifest.json"`,
-      },
-    })
+    return NextResponse.json(manifest)
   } catch (error) {
     return NextResponse.json({ error: "Failed to generate manifest" }, { status: 500 })
   }

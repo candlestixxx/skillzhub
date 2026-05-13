@@ -1,29 +1,7 @@
 import { NextResponse } from "next/server"
-import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { MissionSchema } from "@/lib/schemas"
-
-const missionResponseSelect = {
-  id: true,
-  company_id: true,
-  title: true,
-  description: true,
-  task_type: true,
-  environment_type: true,
-  constraints: true,
-  required_resolution: true,
-  required_fps: true,
-  min_duration_seconds: true,
-  max_duration_seconds: true,
-  price_per_minute: true,
-  license_type: true,
-  status: true,
-  created_at: true,
-  updated_at: true,
-  webhook_url: true,
-  company: { select: { name: true } },
-}
 
 /**
  * @swagger
@@ -44,7 +22,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const status = searchParams.get('status')
 
-    const whereClause: Prisma.MissionWhereInput = {}
+    let whereClause: any = {}
 
     if (status) {
       whereClause.status = status;
@@ -56,7 +34,7 @@ export async function GET(req: Request) {
 
     const missions = await prisma.mission.findMany({
       where: whereClause,
-      select: missionResponseSelect,
+      include: { company: { select: { name: true } } },
       orderBy: { created_at: 'desc' }
     })
 
@@ -105,16 +83,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Validation failed", details: validated.error.format() }, { status: 400 })
     }
 
-    const payload = { ...validated.data }
-    if (payload.webhook_secret === "") payload.webhook_secret = null
-    if (payload.webhook_url === "") payload.webhook_url = null
-
     const mission = await prisma.mission.create({
       data: {
-        ...payload,
+        ...validated.data,
         company_id: session.user.id
-      },
-      select: missionResponseSelect
+      }
     })
 
     return NextResponse.json(mission, { status: 201 })

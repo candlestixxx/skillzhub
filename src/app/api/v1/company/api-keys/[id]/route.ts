@@ -6,7 +6,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
   const params = await props.params;
   try {
     const session = await auth()
-    if (!session?.user || (session.user.role !== 'COMPANY' && session.user.role !== 'ADMIN')) {
+    if (!session?.user || session.user.role !== 'COMPANY') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -14,11 +14,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
       where: { id: params.id }
     })
 
-    if (!key) {
-        return NextResponse.json({ error: "API Key not found or unauthorized" }, { status: 404 })
-    }
-
-    if (session.user.role === 'COMPANY' && key.company_id !== session.user.id) {
+    if (!key || key.company_id !== session.user.id) {
         return NextResponse.json({ error: "API Key not found or unauthorized" }, { status: 404 })
     }
 

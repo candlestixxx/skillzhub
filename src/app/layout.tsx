@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -9,7 +10,15 @@ export const metadata: Metadata = {
   description: "C2B Marketplace for AI Training Footage",
 };
 
-const version = process.env.NEXT_PUBLIC_APP_VERSION || process.env.npm_package_version || 'v0.0.0'
+// We import the version string at build/runtime from the VERSION file
+import fs from 'fs';
+import path from 'path';
+let version = 'v0.0.0';
+try {
+    version = fs.readFileSync(path.join(process.cwd(), 'VERSION'), 'utf8').trim();
+} catch(e) {
+    console.warn("Could not load VERSION file");
+}
 
 export default function RootLayout({
   children,

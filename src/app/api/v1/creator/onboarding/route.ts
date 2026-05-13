@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
-import { getStripe } from "@/lib/services/stripe"
+import Stripe from "stripe"
+
+let stripeClient: Stripe | null = null;
+function getStripe() {
+    if (!stripeClient && process.env.STRIPE_SECRET_KEY) {
+        stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+            apiVersion: '2025-01-27.acacia'
+        });
+    }
+    return stripeClient;
+}
 
 export async function POST(req: Request) {
   try {

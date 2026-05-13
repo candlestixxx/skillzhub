@@ -10,11 +10,7 @@ function getRedisClient() {
             enableReadyCheck: false,
             retryStrategy: () => null
         });
-        redisClient.on('error', (error) => {
-            if (process.env.NODE_ENV !== 'production') {
-                console.warn('Redis rate limiter error:', error.message);
-            }
-        });
+        redisClient.on('error', () => {}); // silence errors during build
     }
     return redisClient;
 }
@@ -22,9 +18,6 @@ function getRedisClient() {
 export async function rateLimit(identifier: string, limit: number, windowSec: number): Promise<boolean> {
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
        return true; // Bypass rate limit locally or in test
-    }
-    if (limit <= 0) {
-        return false;
     }
 
     try {

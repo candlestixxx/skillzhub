@@ -36,69 +36,63 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
         payout_amount = accepted_minutes * submission.mission.price_per_minute
     }
 
-    let webhookPayload: { datasetId: string; addedDuration: number | null } | null = null
-    const updatedSubmission = await prisma.$transaction(async (tx) => {
-      const updated = await tx.submission.update({
-        where: { id: params.id },
-        data: {
-          processing_status: status,
+    const updatedSubmission = await prisma.submission.update({
+      where: { id: params.id },
+      data: {
+          processing_status: status as any,
           manual_review_status: status,
           accepted_minutes,
           payout_amount,
           rejection_reason
-        }
-      })
-
-      if (status !== 'ACCEPTED') {
-        return updated
       }
-
-      let dataset = await tx.dataset.findFirst({
-        where: { company_id: submission.mission.company_id, title: submission.mission.title + ' Dataset' }
-      })
-
-      if (!dataset) {
-        dataset = await tx.dataset.create({
-          data: {
-            company_id: submission.mission.company_id,
-            title: submission.mission.title + ' Dataset',
-            description: 'Auto-generated dataset for ' + submission.mission.title,
-            source_scope: 'MISSION',
-            status: 'READY',
-            license_type: submission.mission.license_type,
-            total_duration_seconds: updated.duration_seconds || 0
-          }
-        })
-      } else {
-        dataset = await tx.dataset.update({
-          where: { id: dataset.id },
-          data: {
-            total_duration_seconds: { increment: updated.duration_seconds || 0 }
-          }
-        })
-      }
-
-      await tx.datasetSample.create({
-        data: {
-          dataset_id: dataset.id,
-          submission_id: submission.id
-        }
-      })
-
-      await processPayouts(submission.id, tx)
-
-      webhookPayload = { datasetId: dataset.id, addedDuration: updated.duration_seconds }
-      return updated
     })
 
-    if (status === 'ACCEPTED' && submission.mission.webhook_url && webhookPayload) {
-      dispatchWebhook(submission.mission.webhook_url, submission.mission.webhook_secret, {
-        event: "submission.accepted",
-        mission_id: submission.mission.id,
-        submission_id: submission.id,
-        dataset_id: webhookPayload.datasetId,
-        added_duration: webhookPayload.addedDuration
-      })
+    if (status === 'ACCEPTED') {
+        await processPayouts(submission.id)
+
+        let dataset = await prisma.dataset.findFirst({
+            where: { company_id: submission.mission.company_id, title: submission.mission.title + ' Dataset' }
+        })
+
+        if (!dataset) {
+            dataset = await prisma.dataset.create({
+                data: {
+                    company_id: submission.mission.company_id,
+                    title: submission.mission.title + ' Dataset',
+                    description: 'Auto-generated dataset for ' + submission.mission.title,
+                    source_scope: 'MISSION',
+                    status: 'READY',
+                    license_type: submission.mission.license_type,
+                    total_duration_seconds: updatedSubmission.duration_seconds || 0
+                }
+            })
+        } else {
+             dataset = await prisma.dataset.update({
+                where: { id: dataset.id },
+                data: {
+                    total_duration_seconds: dataset.total_duration_seconds + (updatedSubmission.duration_seconds || 0)
+                }
+            })
+        }
+
+        await prisma.datasetSample.create({
+            data: {
+                dataset_id: dataset.id,
+                submission_id: submission.id
+            }
+        })
+
+        // Webhook Dispatch
+        if (submission.mission.webhook_url) {
+            // Do not await to avoid blocking the HTTP response
+            dispatchWebhook(submission.mission.webhook_url, submission.mission.webhook_secret, {
+                event: "submission.accepted",
+                mission_id: submission.mission.id,
+                submission_id: submission.id,
+                dataset_id: dataset.id,
+                added_duration: updatedSubmission.duration_seconds
+            })
+        }
     }
 
     return NextResponse.json(updatedSubmission)

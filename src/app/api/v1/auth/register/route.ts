@@ -7,8 +7,7 @@ import { RegisterSchema } from "@/lib/schemas"
 
 export async function POST(req: NextRequest) {
   try {
-    const forwardedFor = req.headers.get('x-forwarded-for');
-    const ip = req.headers.get('x-real-ip') || forwardedFor?.split(',')[0]?.trim() || '127.0.0.1';
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
     const isAllowed = await rateLimit(`register:${ip}`, 5, 3600); // 5 accounts per hour per IP
 
     if (!isAllowed) {
