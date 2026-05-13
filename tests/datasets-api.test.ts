@@ -9,7 +9,7 @@ vi.mock('../src/lib/auth', () => ({
   auth: vi.fn()
 }))
 
-vi.mock('../src/lib/storage', () => ({
+vi.mock('../src/lib/services/storage', () => ({
   generateDownloadUrl: vi.fn().mockResolvedValue('https://mock-s3-url.com/video.mp4')
 }))
 

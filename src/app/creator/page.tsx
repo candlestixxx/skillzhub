@@ -2,9 +2,45 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
+// Extracted Video Component for Creator Playback
+function CreatorVideoPlayer({ submissionId }: { submissionId: string }) {
+    const [url, setUrl] = useState<string | null>(null)
+    const [error, setError] = useState(false)
+
+    useEffect(() => {
+        async function fetchUrl() {
+            try {
+                const res = await fetch(`/api/v1/creator/submissions/${submissionId}/video`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setUrl(data.url)
+                } else {
+                    setError(true)
+                }
+            } catch (e) {
+                setError(true)
+            }
+        }
+        fetchUrl()
+    }, [submissionId])
+
+    if (error) {
+        return <span className="text-white text-xs">Video Preview Error</span>
+    }
+
+    if (!url) {
+        return <span className="text-white text-xs animate-pulse">Loading Video...</span>
+    }
+
+    return (
+        <video src={url} controls className="w-full h-full object-cover" />
+    )
+}
+
 export default function CreatorDashboard() {
   const router = useRouter()
   const [missions, setMissions] = useState([])
+  const [submissions, setSubmissions] = useState([])
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [uploadingFor, setUploadingFor] = useState<string | null>(null)
@@ -16,13 +52,23 @@ export default function CreatorDashboard() {
     } catch(e) {}
   }
 
-  const fetchMissions = async () => {
+  const fetchDashboardData = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/v1/missions?status=OPEN')
-      if (res.status === 401 || res.status === 403) router.push('/api/auth/signin')
-      const data = await res.json()
-      if (res.ok) setMissions(data)
+      // Fetch open missions
+      const missionsRes = await fetch('/api/v1/missions?status=OPEN')
+      if (missionsRes.status === 401 || missionsRes.status === 403) router.push('/api/auth/signin')
+
+      if (missionsRes.ok) {
+         setMissions(await missionsRes.json())
+      }
+
+      // Fetch creator's past submissions
+      const subRes = await fetch('/api/v1/creator/submissions')
+      if (subRes.ok) {
+          setSubmissions(await subRes.json())
+      }
+
     } catch (e) {
       console.error(e)
     }
@@ -31,7 +77,7 @@ export default function CreatorDashboard() {
 
   useEffect(() => {
      fetchProfile()
-     fetchMissions()
+     fetchDashboardData()
   }, [])
 
   const handleUpload = async (missionId: string) => {
@@ -53,6 +99,7 @@ export default function CreatorDashboard() {
           body: JSON.stringify({ submissionId: initData.submissionId })
       })
       alert('Upload completed! Submission is processing.')
+      fetchDashboardData() // refresh to show the new submission in the list
     } catch (e) {
       alert('Upload failed')
     }
@@ -72,29 +119,75 @@ export default function CreatorDashboard() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
+      {/* Header Profile Section */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Creator Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Creator Dashboard</h1>
             <p className="text-gray-600 mt-1">Welcome back, {profile?.name || 'Creator'}</p>
           </div>
           <div>
              {!profile?.payout_account_id ? (
-                 <button onClick={handleStripeOnboard} className="bg-[#635BFF] text-white px-4 py-2 rounded shadow-sm hover:bg-[#4b45cf] transition font-medium">
+                 <button onClick={handleStripeOnboard} className="bg-[#635BFF] text-white px-5 py-2.5 rounded-lg shadow-sm hover:bg-[#4b45cf] transition font-medium w-full md:w-auto">
                      Setup Stripe Payouts
                  </button>
              ) : (
-                 <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-semibold">
-                     Stripe Connected
-                 </span>
+                 <div className="bg-green-50 border border-green-200 px-4 py-2 rounded-lg flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-green-800 text-sm font-semibold">Stripe Connected</span>
+                 </div>
              )}
           </div>
       </div>
 
+      {/* Submissions History Section */}
+      {submissions.length > 0 && (
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">Your Recent Submissions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {submissions.map((sub: any) => (
+                    <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden flex flex-col bg-gray-50">
+                        {/* Video Player */}
+                        <div className="w-full bg-black flex items-center justify-center aspect-video relative">
+                             <CreatorVideoPlayer submissionId={sub.id} />
+                             {/* Status Badge Overlay */}
+                             <div className="absolute top-2 right-2">
+                                <span className={`text-xs px-2 py-1 rounded shadow-sm font-medium ${
+                                    sub.processing_status === 'ACCEPTED' ? 'bg-green-500 text-white' :
+                                    sub.processing_status === 'REJECTED' || sub.processing_status === 'AUTO_QC_FAIL' ? 'bg-red-500 text-white' :
+                                    'bg-yellow-500 text-white'
+                                }`}>
+                                    {sub.processing_status.replace(/_/g, ' ')}
+                                </span>
+                             </div>
+                        </div>
+                        {/* Meta */}
+                        <div className="p-4 bg-white flex-1 flex flex-col">
+                            <h3 className="font-semibold text-gray-800 line-clamp-1" title={sub.mission.title}>{sub.mission.title}</h3>
+                            <div className="text-xs text-gray-500 mt-2 flex justify-between">
+                                <span>{new Date(sub.created_at).toLocaleDateString()}</span>
+                                {sub.duration_seconds && <span>{sub.duration_seconds}s</span>}
+                            </div>
+                            {sub.payout_amount && (
+                                <div className="mt-auto pt-3 mt-3 border-t border-gray-100">
+                                    <p className="text-sm font-medium text-gray-900 flex justify-between">
+                                        <span>Payout:</span>
+                                        <span className="text-green-600">${sub.payout_amount.toFixed(2)}</span>
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+          </div>
+      )}
+
+      {/* Missions Board Section */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Available Missions</h2>
-            <button onClick={fetchMissions} disabled={loading} className="text-blue-600 text-sm hover:underline disabled:opacity-50 font-medium">
+            <h2 className="text-xl font-semibold text-gray-900">Available Missions</h2>
+            <button onClick={fetchDashboardData} disabled={loading} className="text-blue-600 text-sm hover:underline disabled:opacity-50 font-medium">
                 {loading ? 'Refreshing...' : 'Refresh Board'}
             </button>
         </div>
@@ -104,35 +197,39 @@ export default function CreatorDashboard() {
             <ul className="space-y-4">
               {missions.map((m: any) => (
                 <li key={m.id} className="bg-white p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition">
-                   <div className="flex justify-between items-start">
-                       <div>
+                   <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                       <div className="flex-1">
                            <h3 className="font-bold text-lg text-gray-900">{m.title}</h3>
                            <p className="text-sm text-gray-600 mt-1 max-w-2xl">{m.description}</p>
                            <div className="mt-3 flex gap-2 flex-wrap">
-                               <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">FPS: {m.required_fps || 'Any'}</span>
-                               <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">Res: {m.required_resolution || 'Any'}</span>
-                               <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">Env: {m.environment_type}</span>
+                               <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 font-medium">FPS: {m.required_fps || 'Any'}</span>
+                               <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 font-medium">Res: {m.required_resolution || 'Any'}</span>
+                               <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 font-medium">Env: {m.environment_type}</span>
                            </div>
                        </div>
-                       <div className="text-right">
+                       <div className="text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-3 md:pt-0 mt-3 md:mt-0">
                            <p className="text-2xl font-bold text-green-600">${m.price_per_minute.toFixed(2)}<span className="text-sm text-gray-500 font-normal">/min</span></p>
-                           <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">{m.license_type}</p>
+                           <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide font-medium">{m.license_type}</p>
                        </div>
                    </div>
 
-                   <div className="mt-6 pt-4 border-t border-gray-100 flex justify-end">
-                       <button disabled={uploadingFor === m.id} onClick={() => handleUpload(m.id)} className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 font-medium shadow-sm transition">
-                          {uploadingFor === m.id ? 'Uploading...' : 'Accept Mission & Upload Video'}
+                   <div className="mt-5 pt-4 border-t border-gray-100 flex justify-end">
+                       <button disabled={uploadingFor === m.id} onClick={() => handleUpload(m.id)} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 font-medium shadow-sm transition w-full md:w-auto">
+                          {uploadingFor === m.id ? 'Uploading...' : 'Accept & Upload Video'}
                        </button>
                    </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 text-center py-8">No open missions available right now.</p>
+            <div className="text-center py-12">
+               <p className="text-gray-500">No open missions available right now.</p>
+               <p className="text-xs text-gray-400 mt-2">Check back later for new opportunities.</p>
+            </div>
           )}
         </div>
       </div>
+
     </div>
   )
 }

@@ -1,7 +1,32 @@
 # Changelog
 
+## v0.1.12
+- Added `webhook_url` and `webhook_secret` fields to the `Mission` Prisma schema.
+- Built a secure `dispatchWebhook` service that signs POST payloads with SHA-256 HMAC for company verification.
+- Integrated asynchronous webhook dispatching into the Admin review route whenever a submission is accepted.
+- Updated the Company Dashboard UI to allow setting optional webhook configurations during Mission creation.
+
+## v0.1.11
+- Created new `/api/v1/company/analytics` endpoint leveraging Prisma aggregations (`groupBy`, `aggregate`) to compute dataset volumes, total capital deployed, and submission status distributions.
+- Overhauled the `CompanyDashboard` UI:
+  - Added a Recharts Pie Chart to visualize the Mission Pipeline status distribution.
+  - Added a KPI metric for Total Capital Deployed.
+  - Refined the aesthetics of the Dataset Volumes Bar Chart and all dashboard cards.
+
+## v0.1.10
+- Integrated `@playwright/test` for robust, headless End-to-End (E2E) testing.
+- Configured `playwright.config.ts` to spin up the local Next.js dev server automatically and execute tests against Chromium.
+- Added foundational E2E test suite (`e2e/home.spec.ts`) validating homepage DOM rendering and core navigation links.
+
+## v0.1.9
+- Created the `/api/v1/creator/submissions/[id]/video` route to securely issue presigned S3 URLs to creators for their own past uploads.
+- Enhanced the `CreatorDashboard` UI with a new "Recent Submissions" section featuring a dynamic `CreatorVideoPlayer`, allowing creators to stream their submitted videos and review payout statuses.
+- Polished the Creator dashboard UI with improved responsive layouts and status indicators.
+
 ## v0.1.8
-- Resolved merge conflicts between the MVP feature branch and `main` while preserving the newer MVP implementation across API docs, admin video preview, worker processing, and dependency manifests.
+- Cleaned up root directory by archiving multi-agent instruction files (`AGENTS.md`, `CLAUDE.md`, etc.) into a dedicated `docs/agents/` folder.
+- Refactored core integration utilities (`storage.ts`, `payments.ts`, `queue.ts`) into a new `src/lib/services/` directory to streamline the `lib` folder.
+- Updated import paths globally to reflect the structural refactoring.
 
 ## v0.1.7
 - Refactored `worker.ts` FFprobe extraction logic into a pure, testable utility (`src/lib/video-processor.ts`).

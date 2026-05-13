@@ -12,6 +12,8 @@ export const MissionSchema = z.object({
   price_per_minute: z.number().positive(),
   task_type: z.string(),
   environment_type: z.string(),
+  webhook_url: z.string().url().optional().or(z.literal("")),
+  webhook_secret: z.string().optional().or(z.literal("")),
   license_type: z.enum(["EXCLUSIVE", "NON_EXCLUSIVE", "TIME_LIMITED", "RESEARCH_ONLY"]),
 });
 

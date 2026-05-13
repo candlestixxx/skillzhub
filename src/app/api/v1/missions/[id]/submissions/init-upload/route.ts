@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
-import { generateUploadUrl } from "@/lib/storage"
+import { generateUploadUrl } from "@/lib/services/storage"
 import { rateLimit } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {

@@ -2,7 +2,7 @@
 
 ## Technical Enhancements
 - **Multi-region Storage:** Route uploads to the nearest S3 bucket to lower latency for international creators.
-- **Webhooks:** Allow companies to register a webhook URL to receive notifications when a new dataset sample is approved for their mission.
+
 - **Edge Functions:** Move API key validation and rate-limiting to edge networks (e.g., Vercel Edge Middleware or Cloudflare Workers) to drastically reduce latency and DB load.
 
 ## Product Features

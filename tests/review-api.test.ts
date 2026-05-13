@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { POST as ReviewSubmission } from '../src/app/api/v1/admin/submissions/[id]/review/route'
 import { auth } from '../src/lib/auth'
-import { processPayouts } from '../src/lib/payments'
+import { processPayouts } from '../src/lib/services/payments'
 import { prisma } from '../src/lib/prisma'
 
 vi.mock('../src/lib/auth', () => ({
   auth: vi.fn()
 }))
 
-vi.mock('../src/lib/payments', () => ({
+vi.mock('../src/lib/services/payments', () => ({
   processPayouts: vi.fn()
 }))
 

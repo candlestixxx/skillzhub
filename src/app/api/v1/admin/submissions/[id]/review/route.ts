@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
-import { processPayouts } from "@/lib/payments"
+import { processPayouts } from "@/lib/services/payments"
 import { ReviewSchema } from "@/lib/schemas"
+import { dispatchWebhook } from "@/lib/services/webhooks"
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -66,7 +67,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
                 }
             })
         } else {
-             await prisma.dataset.update({
+             dataset = await prisma.dataset.update({
                 where: { id: dataset.id },
                 data: {
                     total_duration_seconds: dataset.total_duration_seconds + (updatedSubmission.duration_seconds || 0)
@@ -80,6 +81,18 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
                 submission_id: submission.id
             }
         })
+
+        // Webhook Dispatch
+        if (submission.mission.webhook_url) {
+            // Do not await to avoid blocking the HTTP response
+            dispatchWebhook(submission.mission.webhook_url, submission.mission.webhook_secret, {
+                event: "submission.accepted",
+                mission_id: submission.mission.id,
+                submission_id: submission.id,
+                dataset_id: dataset.id,
+                added_duration: updatedSubmission.duration_seconds
+            })
+        }
     }
 
     return NextResponse.json(updatedSubmission)

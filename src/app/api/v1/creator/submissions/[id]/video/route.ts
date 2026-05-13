@@ -5,10 +5,10 @@ import { generateDownloadUrl } from "@/lib/services/storage"
 
 /**
  * @swagger
- * /admin/submissions/{id}/video:
+ * /creator/submissions/{id}/video:
  *   get:
- *     summary: Get presigned video URL for Admin review
- *     description: Returns a temporary presigned URL for the raw video file associated with a submission. Only accessible to ADMIN users.
+ *     summary: Get presigned video URL for Creator playback
+ *     description: Returns a temporary presigned URL for the raw video file associated with a submission. Only accessible to the CREATOR who uploaded it.
  *     parameters:
  *       - in: path
  *         name: id
@@ -22,7 +22,7 @@ import { generateDownloadUrl } from "@/lib/services/storage"
  *       401:
  *         description: Unauthorized.
  *       403:
- *         description: Forbidden (Not an admin).
+ *         description: Forbidden (Not the owning creator).
  *       404:
  *         description: Submission not found or no storage key.
  */
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
   const params = await props.params;
   try {
     const session = await auth()
-    if (!session?.user || session.user.role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'CREATOR') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -40,6 +40,11 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     if (!submission || !submission.raw_storage_key) {
       return NextResponse.json({ error: "Submission or video not found" }, { status: 404 })
+    }
+
+    // Ensure only the creator who uploaded the video can fetch the download URL
+    if (submission.creator_id !== session.user.id) {
+       return NextResponse.json({ error: "Forbidden: You do not own this submission" }, { status: 403 })
     }
 
     const videoUrl = await generateDownloadUrl(submission.raw_storage_key);

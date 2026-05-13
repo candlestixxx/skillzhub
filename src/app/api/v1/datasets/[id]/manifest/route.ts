@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
-import { generateDownloadUrl } from "@/lib/storage"
+import { generateDownloadUrl } from "@/lib/services/storage"
 import crypto from "crypto"
 
 /**

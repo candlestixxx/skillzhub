@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { prisma } from '../prisma'
 import Stripe from "stripe"
 
 // Lazy initialize stripe to prevent Next.js build errors if STRIPE_SECRET_KEY is missing
