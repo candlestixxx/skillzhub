@@ -21,15 +21,10 @@ function getConnection() {
     return connection;
 }
 
-export const processingQueue = new Proxy({} as Queue, {
-    get: (target, prop) => {
-        if (!queueInstance) {
-             queueInstance = new Queue('video-processing', { connection: getConnection() });
-        }
-        const val = queueInstance[prop as keyof Queue];
-        if (typeof val === 'function') {
-             return val.bind(queueInstance);
-        }
-        return val;
-    }
-});
+export function getProcessingQueue() {
+  if (!queueInstance) {
+    // Queue name must match the worker's subscribed queue in worker.ts.
+    queueInstance = new Queue('video-processing', { connection: getConnection() })
+  }
+  return queueInstance
+}

@@ -22,6 +22,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
     if (session.user.role === 'CREATOR' && submission.creator_id !== session.user.id) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
+    // In this MVP schema, User.id is also the company identifier used by Mission.company_id.
     if (session.user.role === 'COMPANY' && submission.mission.company_id !== session.user.id) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }

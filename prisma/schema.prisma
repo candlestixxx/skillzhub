@@ -115,8 +115,6 @@ model Submission {
   updated_at              DateTime         @updatedAt
 
   dataset_samples DatasetSample[]
-  webhook_url            String?
-  webhook_secret         String?
   license_records LicenseRecord[]
   payment_ledgers PaymentLedger[]
 }
@@ -137,8 +135,6 @@ model Dataset {
   updated_at             DateTime           @updatedAt
 
   dataset_samples DatasetSample[]
-  webhook_url            String?
-  webhook_secret         String?
   license_records LicenseRecord[]
 }
 

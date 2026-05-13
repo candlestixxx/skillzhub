@@ -3,6 +3,7 @@ import Redis from 'ioredis'
 import { PrismaClient } from '@prisma/client'
 import { probeVideo, extractMetadata } from './src/lib/video-processor'
 
+// The worker runs as a standalone process/container, so it maintains its own Prisma client lifecycle.
 const prisma = new PrismaClient()
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
 

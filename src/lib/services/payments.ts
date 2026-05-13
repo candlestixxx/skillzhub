@@ -1,24 +1,15 @@
+import { Prisma } from "@prisma/client"
 import { prisma } from '../prisma'
-import Stripe from "stripe"
+import { getStripe } from "./stripe"
 
-// Lazy initialize stripe to prevent Next.js build errors if STRIPE_SECRET_KEY is missing
-let stripeClient: Stripe | null = null;
-function getStripe() {
-    if (!stripeClient && process.env.STRIPE_SECRET_KEY) {
-        stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
-            apiVersion: '2025-01-27.acacia'
-        });
-    }
-    return stripeClient;
-}
-
-export async function processPayouts(submissionId: string) {
-    const submission = await prisma.submission.findUnique({
+export async function processPayouts(submissionId: string, tx?: Prisma.TransactionClient) {
+    const db = tx ?? prisma
+    const submission = await db.submission.findUnique({
         where: { id: submissionId },
         include: { mission: true, creator: true }
     })
 
-    if (!submission || submission.processing_status !== 'ACCEPTED' || !submission.accepted_minutes) {
+    if (!submission || submission.processing_status !== 'ACCEPTED' || submission.accepted_minutes == null || submission.accepted_minutes < 0) {
         throw new Error("Invalid submission for payout")
     }
 
@@ -31,12 +22,14 @@ export async function processPayouts(submissionId: string) {
     const platformFee = gross * 0.20 // 20% fee
     const net = gross - platformFee
 
-    const ledger = await prisma.paymentLedger.create({
+    const roundedAcceptedMinutes = Number(submission.accepted_minutes.toFixed(4))
+
+    const ledger = await db.paymentLedger.create({
         data: {
             submission_id: submission.id,
             creator_id: submission.creator_id,
             mission_id: submission.mission_id,
-            accepted_minutes: submission.accepted_minutes,
+            accepted_minutes: roundedAcceptedMinutes,
             rate_per_minute: rate,
             gross_amount: gross,
             platform_fee_amount: platformFee,
@@ -66,14 +59,14 @@ export async function processPayouts(submissionId: string) {
             }
         });
 
-        await prisma.paymentLedger.update({
+        await db.paymentLedger.update({
             where: { id: ledger.id },
             data: { payout_status: "completed", stripe_transfer_id: transfer.id }
         })
 
     } catch (error) {
         console.error("Stripe Transfer Failed:", error);
-        await prisma.paymentLedger.update({
+        await db.paymentLedger.update({
             where: { id: ledger.id },
             data: { payout_status: "failed" }
         })

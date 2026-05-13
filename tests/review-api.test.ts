@@ -5,6 +5,16 @@ import { auth } from '../src/lib/auth'
 import { processPayouts } from '../src/lib/services/payments'
 import { prisma } from '../src/lib/prisma'
 
+type TxMock = {
+  submission: { update: ReturnType<typeof vi.fn> }
+  dataset: {
+    findFirst: ReturnType<typeof vi.fn>
+    create: ReturnType<typeof vi.fn>
+    update: ReturnType<typeof vi.fn>
+  }
+  datasetSample: { create: ReturnType<typeof vi.fn> }
+}
+
 vi.mock('../src/lib/auth', () => ({
   auth: vi.fn()
 }))
@@ -14,25 +24,34 @@ vi.mock('../src/lib/services/payments', () => ({
 }))
 
 vi.mock('../src/lib/prisma', () => {
+  const tx: TxMock = {
+    submission: {
+      update: vi.fn()
+    },
+    dataset: {
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn()
+    },
+    datasetSample: {
+      create: vi.fn()
+    }
+  }
+
   return {
     prisma: {
+        $transaction: vi.fn(async (fn: (tx: TxMock) => Promise<unknown>) => fn(tx)),
         submission: {
-            findUnique: vi.fn(),
-            update: vi.fn()
+            findUnique: vi.fn()
         },
-        dataset: {
-            findFirst: vi.fn(),
-            create: vi.fn(),
-            update: vi.fn()
-        },
-        datasetSample: {
-            create: vi.fn()
-        }
+        __tx: tx
     }
   }
 })
 
 describe('Admin Review API', () => {
+  const prismaMock = prisma as unknown as { __tx: TxMock }
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -45,14 +64,14 @@ describe('Admin Review API', () => {
   })
 
   it('rejects company users from reviewing', async () => {
-    vi.mocked(auth).mockResolvedValue({ user: { id: 'test-user', role: 'COMPANY' } } as any)
+    vi.mocked(auth).mockResolvedValue({ user: { id: 'test-user', role: 'COMPANY' } } as never)
     const req = new NextRequest('http://localhost/api/v1/admin/submissions/1/review', { method: 'POST' })
     const res = await ReviewSubmission(req, { params: Promise.resolve({ id: '1' }) })
     expect(res.status).toBe(403)
   })
 
   it('accepts valid review from admin and triggers payout', async () => {
-    vi.mocked(auth).mockResolvedValue({ user: { id: 'admin-user', role: 'ADMIN' } } as any)
+    vi.mocked(auth).mockResolvedValue({ user: { id: 'admin-user', role: 'ADMIN' } } as never)
 
     vi.mocked(prisma.submission.findUnique).mockResolvedValue({
         id: 'sub-1',
@@ -64,15 +83,16 @@ describe('Admin Review API', () => {
             price_per_minute: 10,
             license_type: 'EXCLUSIVE'
         }
-    } as any)
+    } as never)
 
-    vi.mocked(prisma.submission.update).mockResolvedValue({
+    vi.mocked(prismaMock.__tx.submission.update).mockResolvedValue({
         id: 'sub-1',
         duration_seconds: 120
-    } as any)
+    } as never)
 
-    vi.mocked(prisma.dataset.findFirst).mockResolvedValue(null)
-    vi.mocked(prisma.dataset.create).mockResolvedValue({ id: 'ds-1' } as any)
+    vi.mocked(prismaMock.__tx.dataset.findFirst).mockResolvedValue(null)
+    vi.mocked(prismaMock.__tx.dataset.create).mockResolvedValue({ id: 'ds-1' } as never)
+    vi.mocked(prismaMock.__tx.datasetSample.create).mockResolvedValue({ id: 'sample-1' } as never)
 
     const req = new NextRequest('http://localhost/api/v1/admin/submissions/1/review', {
       method: 'POST',
@@ -85,7 +105,7 @@ describe('Admin Review API', () => {
     const res = await ReviewSubmission(req, { params: Promise.resolve({ id: 'sub-1' }) })
 
     expect(res.status).toBe(200)
-    expect(processPayouts).toHaveBeenCalledWith('sub-1')
-    expect(prisma.datasetSample.create).toHaveBeenCalled()
+    expect(processPayouts).toHaveBeenCalledWith('sub-1', expect.any(Object))
+    expect(prismaMock.__tx.datasetSample.create).toHaveBeenCalled()
   })
 })
