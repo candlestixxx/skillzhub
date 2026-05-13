@@ -23,7 +23,7 @@
 - [ ] Integrate a real Vision-Language Model (VLM) (e.g., Gemini Flash or Qwen-VL) into the worker for auto-labeling (action summary, object tags).
 
 ## Phase 4: Polish, UI, and E2E Tests
-- [ ] Add Playwright for end-to-end user flow testing.
+- [x] Add Playwright for end-to-end user flow testing.
 - [x] Build out real video playback interfaces for the Creator dashboard.
 - [ ] Improve Dataset Analytics dashboard with deeper aggregations.
 - [x] OpenAPI / Swagger documentation generation for `/api/v1/*`.

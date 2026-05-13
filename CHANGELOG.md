@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.10
+- Integrated `@playwright/test` for robust, headless End-to-End (E2E) testing.
+- Configured `playwright.config.ts` to spin up the local Next.js dev server automatically and execute tests against Chromium.
+- Added foundational E2E test suite (`e2e/home.spec.ts`) validating homepage DOM rendering and core navigation links.
+
 ## v0.1.9
 - Created the `/api/v1/creator/submissions/[id]/video` route to securely issue presigned S3 URLs to creators for their own past uploads.
 - Enhanced the `CreatorDashboard` UI with a new "Recent Submissions" section featuring a dynamic `CreatorVideoPlayer`, allowing creators to stream their submitted videos and review payout statuses.
