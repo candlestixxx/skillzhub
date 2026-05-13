@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         const hashedKey = crypto.createHash('sha256').update(rawKey).digest('hex')
 
         const apiKeyRecord = await prisma.aPIKey.findFirst({
-            where: { hashed_key: hashedKey, status: 'active' }
+            where: { hashed_key: hashedKey, status: { in: ['active', 'ACTIVE'] } }
         });
 
         if (apiKeyRecord) {
