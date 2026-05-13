@@ -4,6 +4,7 @@
 - Resolved merge conflicts with `main` while preserving the feature branch’s latest webhook, analytics, and creator/company dashboard work.
 - Integrated non-conflicting files from `main` required for a clean merge state.
 - Removed duplicate legacy `src/lib/{storage,queue,payments}.ts` files to keep the active `src/lib/services/*` architecture consistent.
+- Removed duplicate root AI-instruction files to retain `docs/agents/*` as the single source of truth.
 
 ## v0.1.12
 - Added `webhook_url` and `webhook_secret` fields to the `Mission` Prisma schema.
