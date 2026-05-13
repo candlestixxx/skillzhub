@@ -24,7 +24,7 @@
 
 ## Phase 4: Polish, UI, and E2E Tests
 - [ ] Add Playwright for end-to-end user flow testing.
-- [ ] Build out real video playback interfaces for the Creator dashboard.
+- [x] Build out real video playback interfaces for the Creator dashboard.
 - [ ] Improve Dataset Analytics dashboard with deeper aggregations.
 - [x] OpenAPI / Swagger documentation generation for `/api/v1/*`.
 

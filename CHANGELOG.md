@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.9
+- Created the `/api/v1/creator/submissions/[id]/video` route to securely issue presigned S3 URLs to creators for their own past uploads.
+- Enhanced the `CreatorDashboard` UI with a new "Recent Submissions" section featuring a dynamic `CreatorVideoPlayer`, allowing creators to stream their submitted videos and review payout statuses.
+- Polished the Creator dashboard UI with improved responsive layouts and status indicators.
+
 ## v0.1.8
 - Cleaned up root directory by archiving multi-agent instruction files (`AGENTS.md`, `CLAUDE.md`, etc.) into a dedicated `docs/agents/` folder.
 - Refactored core integration utilities (`storage.ts`, `payments.ts`, `queue.ts`) into a new `src/lib/services/` directory to streamline the `lib` folder.
