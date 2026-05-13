@@ -10,16 +10,16 @@ const MissionSchemaBase = z.object({
   title: z.string().min(3, "Title is required"),
   description: z.string().min(10, "Description needs to be detailed"),
   price_per_minute: z.number().positive(),
-  task_type: z.enum([
-    "manipulation",
-    "navigation",
-    "inspection",
-    "other",
-    "KITCHEN_MANIPULATION",
-    "WAREHOUSE_NAVIGATION",
-    "AERIAL_INSPECTION",
-  ]),
-  environment_type: z.enum(["indoor", "outdoor", "mixed", "any", "INDOOR", "OUTDOOR", "MIXED"]),
+  task_type: z
+    .string()
+    .min(1)
+    .transform((value) => value.toLowerCase())
+    .pipe(z.enum(["manipulation", "navigation", "inspection", "other", "kitchen_manipulation", "warehouse_navigation", "aerial_inspection"])),
+  environment_type: z
+    .string()
+    .min(1)
+    .transform((value) => value.toLowerCase())
+    .pipe(z.enum(["indoor", "outdoor", "mixed", "any"])),
   required_resolution: z.string().min(2).max(64).optional(),
   required_fps: z.number().int().positive().max(240).optional(),
   min_duration_seconds: z.number().int().positive().optional(),
