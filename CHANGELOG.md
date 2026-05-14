@@ -1,9 +1,5 @@
 # Changelog
 
-## v0.1.18
-- Implemented the `POST /api/v1/datasets/[id]/synthetic` endpoint to handle synthetic data generation requests.
-- Connected the "Generate Depth Maps" and "Generate Segmentation Masks" UI buttons on the Company Dashboard to properly trigger background job processing via the new API.
-
 ## v0.1.17
 - Implemented "Bounty Boosts" dynamic pricing mechanism.
 - Created `/api/v1/missions/[id]/boost` endpoint enabling companies to increment an active mission's `price_per_minute` payout by 20%.

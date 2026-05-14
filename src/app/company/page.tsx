@@ -105,22 +105,6 @@ export default function CompanyDashboard() {
       } catch (e) {}
   }
 
-  const handleGenerateSynthetic = async (datasetId: string, type: "depth" | "segmentation") => {
-      try {
-          const res = await fetch(`/api/v1/datasets/${datasetId}/synthetic`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ type })
-          })
-          if (res.ok) {
-              const data = await res.json()
-              alert(`Success: ${data.message}\nTracking Job ID: ${data.jobId}`)
-          } else {
-              alert("Failed to queue generation.")
-          }
-      } catch (e) {}
-  }
-
   const handleDeleteKey = async (id: string) => {
       try {
           const res = await fetch(`/api/v1/company/api-keys/${id}`, { method: 'DELETE' })
@@ -308,10 +292,10 @@ export default function CompanyDashboard() {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                 Download JSON Manifest
                             <div className="grid grid-cols-2 gap-2 mt-3">
-                               <button onClick={() => handleGenerateSynthetic(d.id, "depth")} className="w-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-blue-100 transition shadow-sm">
+                               <button onClick={() => alert("Depth Map generation pipeline coming in Phase 8!")} className="w-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-blue-100 transition shadow-sm">
                                    + Depth Maps
                                </button>
-                               <button onClick={() => handleGenerateSynthetic(d.id, "segmentation")} className="w-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-blue-100 transition shadow-sm">
+                               <button onClick={() => alert("Segmentation Mask generation pipeline coming in Phase 8!")} className="w-full bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-blue-100 transition shadow-sm">
                                    + Seg. Masks
                                </button>
                             </div>
