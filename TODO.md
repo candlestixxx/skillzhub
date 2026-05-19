@@ -13,3 +13,4 @@
 
 ### Low Priority
 - [x] Expand Vitest test suite to cover all Prisma schemas and background worker logic.
+- [x] Integrate real Google Gemini VLM auto-labeling within worker.ts, deprecating hardcoded mock labels.

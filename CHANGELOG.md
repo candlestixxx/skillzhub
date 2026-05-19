@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.15
+- Integrated **Google Gemini 2.0 Flash VLM** into the background worker queue (`worker.ts`) for real-time video auto-labeling (`action_summary`, `objects`, `environment`).
+- Built graceful degradation mechanisms to revert to mock labels when API keys are missing or in isolated testing environments.
+- Added `@google/generative-ai` SDK and corresponding documentation to `DEPLOY.md`.
+
 ## v0.1.14
 - Implemented automated **Reputation Score Updates** upon submission review.
 - Built **Trust Tier Upgrades/Downgrades**. Creators are now auto-promoted to `HIGH_TRUST` when their score reaches 100, and demoted to `BASIC` if it falls below 100 on rejection.

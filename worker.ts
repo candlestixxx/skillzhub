@@ -3,6 +3,7 @@ import Redis from 'ioredis'
 import { PrismaClient } from '@prisma/client'
 import { probeVideo, extractMetadata } from './src/lib/video-processor'
 import { acceptSubmissionAndTriggerDownstream } from './src/lib/services/submissions'
+import { analyzeVideoWithVLM } from './src/lib/services/vlm-processor'
 
 const prisma = new PrismaClient()
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
@@ -39,11 +40,8 @@ const worker = new Worker('video-processing', async job => {
 
     const isQCPass = width >= 1920 && fps >= 30
 
-    const mockLabels = {
-        action_summary: "Descriptive Action: Human performing task in recorded environment",
-        objects: ["human", "tool", "environment"],
-        environment: ["indoor"]
-    }
+    console.log(`Attempting VLM analysis for ${rawStorageKey}...`)
+    const vlmLabels = await analyzeVideoWithVLM(rawStorageKey);
 
     // Update submission with extracted metadata and VLM labels
     const updatedSubmission = await prisma.submission.update({
@@ -56,7 +54,7 @@ const worker = new Worker('video-processing', async job => {
             fps: fps,
             processing_status: isQCPass ? 'IN_REVIEW' : 'AUTO_QC_FAIL',
             auto_qc_report: { passed: isQCPass, checks: { resolution: true, fps: true } },
-            labels_summary: mockLabels,
+            labels_summary: vlmLabels,
             normalized_storage_key: rawStorageKey
         }
     })

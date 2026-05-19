@@ -20,7 +20,7 @@
 - [x] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/storage.ts` (currently mocked).
 - [x] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/payments.ts` and API routes (currently mocked).
 - [x] Connect BullMQ `worker.ts` to real FFmpeg subprocesses for video normalization.
-- [ ] Integrate a real Vision-Language Model (VLM) (e.g., Gemini Flash or Qwen-VL) into the worker for auto-labeling (action summary, object tags).
+- [x] Integrate a real Vision-Language Model (VLM) (e.g., Gemini Flash or Qwen-VL) into the worker for auto-labeling (action summary, object tags).
 
 ## Phase 4: Polish, UI, and E2E Tests
 - [x] Add Playwright for end-to-end user flow testing.
