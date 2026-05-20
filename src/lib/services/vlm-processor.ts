@@ -1,11 +1,25 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleAIFileManager } from "@google/generative-ai/server";
+import fs from "fs";
+import path from "path";
+import os from "os";
+
+/**
+ * Downloads a file from a URL to a temporary local path.
+ */
+async function downloadFile(url: string, destPath: string): Promise<void> {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to download file: ${response.statusText}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    fs.writeFileSync(destPath, buffer);
+}
 
 /**
  * Extracts action_summary, objects, and environment labels from a video URL using Gemini 2.0 Flash.
  * If the GEMINI_API_KEY is not set or the request fails, it degrades gracefully to mock data.
- * Note: A real production implementation might need to handle video upload to Google's File API first
- * if the URL is not directly accessible, or extract frames using ffmpeg first.
- * For this implementation, we attempt a direct call and mock on failure.
+ * This implementation downloads the video to a temp file and uses the Google File API for reliable ingestion.
  */
 export async function analyzeVideoWithVLM(videoUrl: string): Promise<{ action_summary: string, objects: string[], environment: string[] }> {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -21,17 +35,56 @@ export async function analyzeVideoWithVLM(videoUrl: string): Promise<{ action_su
         return mockLabels;
     }
 
+    let tempFilePath = "";
+    let uploadedFileName = "";
+    let fileManager: GoogleAIFileManager | null = null;
+
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
+        fileManager = new GoogleAIFileManager(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
+        // 1. Download video to a temporary file
+        const tempDir = os.tmpdir();
+        const fileExt = videoUrl.split('?')[0].split('.').pop() || 'mp4';
+        tempFilePath = path.join(tempDir, `vlm_${Date.now()}.${fileExt}`);
+
+        console.log(`Downloading video for VLM processing to ${tempFilePath}...`);
+        await downloadFile(videoUrl, tempFilePath);
+
+        // 2. Upload the file using GoogleAIFileManager
+        console.log(`Uploading video to Google File API...`);
+        const uploadResponse = await fileManager.uploadFile(tempFilePath, {
+            mimeType: `video/${fileExt === 'webm' ? 'webm' : 'mp4'}`,
+            displayName: "SkillzHub Video Sample",
+        });
+
+        uploadedFileName = uploadResponse.file.name;
+        console.log(`Upload complete. File URI: ${uploadResponse.file.uri}`);
+
+        // 3. Poll for processing completion if necessary (videos take time to process)
+        let fileState = uploadResponse.file.state;
+        while (fileState === "PROCESSING") {
+             console.log("Waiting for video processing to complete on Google's servers...");
+             await new Promise((resolve) => setTimeout(resolve, 5000));
+             const fileInfo = await fileManager.getFile(uploadedFileName);
+             fileState = fileInfo.state;
+             if (fileState === "FAILED") {
+                 throw new Error("Google API failed to process the uploaded video.");
+             }
+        }
+
+        // 4. Generate content using the uploaded file's URI
         const prompt = "Analyze this video and provide a JSON response with exactly three keys: 'action_summary' (a brief description of what is happening), 'objects' (an array of strings listing visible items), and 'environment' (an array of strings describing the setting).";
 
-        // Note: For Gemini to process a remote URL directly, it often requires the File API.
-        // If passing the URL string directly fails, we catch it and fallback.
         const result = await model.generateContent([
-            prompt,
-            videoUrl
+            {
+                fileData: {
+                    mimeType: uploadResponse.file.mimeType,
+                    fileUri: uploadResponse.file.uri
+                }
+            },
+            { text: prompt },
         ]);
 
         const responseText = result.response.text();
@@ -46,5 +99,24 @@ export async function analyzeVideoWithVLM(videoUrl: string): Promise<{ action_su
     } catch (error) {
         console.error("VLM extraction failed. Falling back to mock labels.", error);
         return mockLabels;
+    } finally {
+        // Clean up: delete local temp file
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+            try {
+                fs.unlinkSync(tempFilePath);
+            } catch (cleanupError) {
+                console.error(`Failed to delete temporary file ${tempFilePath}:`, cleanupError);
+            }
+        }
+
+        // Clean up: delete from Google File API
+        if (fileManager && uploadedFileName) {
+            try {
+                await fileManager.deleteFile(uploadedFileName);
+                console.log(`Deleted file ${uploadedFileName} from Google File API.`);
+            } catch (deleteError) {
+                console.error(`Failed to delete file ${uploadedFileName} from Google File API:`, deleteError);
+            }
+        }
     }
 }

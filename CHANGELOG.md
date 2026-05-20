@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.17
+- Refactored `src/lib/services/vlm-processor.ts` to utilize the **Google File API** (`GoogleAIFileManager`) for more robust handling of video ingestion, preventing direct URL ingestion failures on non-public storage URIs.
+
 ## v0.1.16
 - Enhanced **Creator Dashboard UI** with a visual progress bar illustrating the creator's reputation score and their progression towards the 100-point `HIGH_TRUST` threshold.
 
