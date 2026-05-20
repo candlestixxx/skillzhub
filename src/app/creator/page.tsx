@@ -125,7 +125,7 @@ export default function CreatorDashboard() {
     <div className="p-8 max-w-5xl mx-auto space-y-8">
       {/* Header Profile Section */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>
+          <div className="flex-1 w-full md:w-auto">
             <h1 className="text-3xl font-bold text-gray-900">Creator Dashboard</h1>
             <div className="flex items-center gap-3 mt-1">
                 <p className="text-gray-600">Welcome back, {profile?.name || 'Creator'}</p>
@@ -136,12 +136,29 @@ export default function CreatorDashboard() {
                         {profile.trust_tier.replace('_', ' ')}
                     </span>
                 )}
-                {profile?.reputation_score !== undefined && (
-                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                        Score: {profile.reputation_score}
-                    </span>
-                )}
             </div>
+            {profile?.reputation_score !== undefined && (
+                <div className="mt-4 max-w-sm">
+                    <div className="flex justify-between items-end mb-1">
+                        <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Reputation Score</span>
+                        <span className="text-sm font-bold text-indigo-600">{profile.reputation_score} <span className="text-gray-400 text-xs font-normal">/ 100</span></span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div
+                            className={`h-2.5 rounded-full transition-all duration-500 ${
+                                profile.reputation_score >= 100 ? 'bg-indigo-600' :
+                                profile.reputation_score >= 50 ? 'bg-amber-400' : 'bg-red-400'
+                            }`}
+                            style={{ width: `${Math.min(Math.max(profile.reputation_score, 0), 100)}%` }}
+                        ></div>
+                    </div>
+                    {profile.reputation_score < 100 && (
+                        <p className="text-[10px] text-gray-500 mt-1 italic">
+                            Reach 100 points to unlock HIGH TRUST tier for auto-approvals!
+                        </p>
+                    )}
+                </div>
+            )}
           </div>
           <div>
              {!profile?.payout_account_id ? (

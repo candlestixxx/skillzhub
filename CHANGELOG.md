@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.16
+- Enhanced **Creator Dashboard UI** with a visual progress bar illustrating the creator's reputation score and their progression towards the 100-point `HIGH_TRUST` threshold.
+
 ## v0.1.15
 - Integrated **Google Gemini 2.0 Flash VLM** into the background worker queue (`worker.ts`) for real-time video auto-labeling (`action_summary`, `objects`, `environment`).
 - Built graceful degradation mechanisms to revert to mock labels when API keys are missing or in isolated testing environments.
