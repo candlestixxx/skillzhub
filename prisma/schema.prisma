@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CREATOR
+  COMPANY
+  ADMIN
+}
+
+enum TrustTier {
+  BASIC
+  HIGH_TRUST
+}
+
+enum MissionStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum LicenseType {
+  EXCLUSIVE
+  NON_EXCLUSIVE
+  TIME_LIMITED
+  RESEARCH_ONLY
+}
+
+enum ProcessingStatus {
+  UPLOADED
+  PROCESSING
+  AUTO_QC_PASS
+  AUTO_QC_FAIL
+  IN_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum DatasetSourceScope {
+  MISSION
+  MULTI_MISSION
+}
+
+enum DatasetStatus {
+  DRAFT
+  READY
+  PURCHASED
+  ARCHIVED
+}
+
+model User {
+  id                String    @id @default(uuid())
+  role              Role      @default(CREATOR)
+  name              String?
+  email             String    @unique
+  password_hash     String?
+  kyc_status        String?
+  payout_account_id String?
+  trust_tier        TrustTier @default(BASIC)
+  reputation_score  Int       @default(0)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  missions       Mission[]
+  submissions    Submission[]
+  datasets       Dataset[]
+  api_keys       APIKey[]
+  payment_ledger PaymentLedger[]
+}
+
+model Mission {
+  id                     String        @id @default(uuid())
+  company_id             String
+  company                User          @relation(fields: [company_id], references: [id])
+  title                  String
+  description            String
+  task_type              String
+  environment_type       String
+  constraints            Json?
+  required_resolution    String?
+  required_fps           Int?
+  min_duration_seconds   Int?
+  max_duration_seconds   Int?
+  price_per_minute       Float
+  license_type           LicenseType
+  status                 MissionStatus @default(DRAFT)
+  created_at             DateTime      @default(now())
+  updated_at             DateTime      @updatedAt
+
+  submissions      Submission[]
+  webhook_url            String?
+  webhook_secret         String?
+  license_records  LicenseRecord[]
+  payment_ledgers  PaymentLedger[]
+}
+
+model Submission {
+  id                      String           @id @default(uuid())
+  mission_id              String
+  mission                 Mission          @relation(fields: [mission_id], references: [id])
+  creator_id              String
+  creator                 User             @relation(fields: [creator_id], references: [id])
+  raw_storage_key         String?
+  normalized_storage_key  String?
+  duration_seconds        Float?
+  resolution_width        Int?
+  resolution_height       Int?
+  fps                     Float?
+  processing_status       ProcessingStatus @default(UPLOADED)
+  auto_qc_report          Json?
+  labels_summary          Json?
+  manual_review_status    String?
+  accepted_minutes        Float?
+  payout_amount           Float?
+  rejection_reason        String?
+  created_at              DateTime         @default(now())
+  updated_at              DateTime         @updatedAt
+
+  dataset_samples DatasetSample[]
+  webhook_url            String?
+  webhook_secret         String?
+  license_records LicenseRecord[]
+  payment_ledgers PaymentLedger[]
+}
+
+model Dataset {
+  id                     String             @id @default(uuid())
+  company_id             String
+  company                User               @relation(fields: [company_id], references: [id])
+  title                  String
+  description            String?
+  source_scope           DatasetSourceScope
+  status                 DatasetStatus      @default(DRAFT)
+  total_duration_seconds Float              @default(0)
+  label_coverage         Json?
+  license_type           LicenseType
+  price                  Float?
+  created_at             DateTime           @default(now())
+  updated_at             DateTime           @updatedAt
+
+  dataset_samples DatasetSample[]
+  webhook_url            String?
+  webhook_secret         String?
+  license_records LicenseRecord[]
+}
+
+model DatasetSample {
+  id                String     @id @default(uuid())
+  dataset_id        String
+  dataset           Dataset    @relation(fields: [dataset_id], references: [id])
+  submission_id     String
+  submission        Submission @relation(fields: [submission_id], references: [id])
+  effective_license Json?
+}
+
+model LicenseRecord {
+  id             String       @id @default(uuid())
+  mission_id     String?
+  mission        Mission?     @relation(fields: [mission_id], references: [id])
+  submission_id  String?
+  submission     Submission?  @relation(fields: [submission_id], references: [id])
+  dataset_id     String?
+  dataset        Dataset?     @relation(fields: [dataset_id], references: [id])
+  license_type   LicenseType
+  terms          Json?
+  effective_from DateTime?
+  effective_to   DateTime?
+  usage_scope    String?
+}
+
+model APIKey {
+  id            String    @id @default(uuid())
+  company_id    String
+  company       User      @relation(fields: [company_id], references: [id])
+  hashed_key    String    @unique
+  name          String
+  status        String    @default("active")
+  last_used_at  DateTime?
+  created_at    DateTime  @default(now())
+}
+
+model PaymentLedger {
+  id                  String     @id @default(uuid())
+  submission_id       String
+  submission          Submission @relation(fields: [submission_id], references: [id])
+  creator_id          String
+  creator             User       @relation(fields: [creator_id], references: [id])
+  mission_id          String
+  mission             Mission    @relation(fields: [mission_id], references: [id])
+  accepted_minutes    Float
+  rate_per_minute     Float
+  gross_amount        Float
+  platform_fee_amount Float
+  net_payout_amount   Float
+  payout_status       String     @default("pending")
+  stripe_transfer_id  String?
+  created_at          DateTime   @default(now())
+}
