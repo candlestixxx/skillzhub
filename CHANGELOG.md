@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.20
+- Added a "Boost (+20%)" button to active OPEN missions in the Company Dashboard (`src/app/company/page.tsx`), enabling companies to dynamically surge pricing to incentivize creators.
+
 ## v0.1.19
 - Fixed major blocking bug in the worker's VLM pipeline where raw S3 storage keys were being erroneously passed into the Gemini video fetcher. It now securely generates a temporary AWS S3 pre-signed URL before passing it to Google AI.
 - Updated the hallucinated model prompt from `gemini-2.5-flash` to the correct `gemini-2.0-flash`.

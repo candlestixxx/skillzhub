@@ -30,6 +30,7 @@
 
 ## Phase 6: Advanced Connectivity
 - [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
+- [x] Bounty Boosts integration allowing companies to dynamically surge pricing by +20% for specific open missions via UI.
 
 ## Phase 5: Additional Deployment Polish
 - [x] Dockerfile explicitly written for the independent BullMQ `worker.ts` node process.

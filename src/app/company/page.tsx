@@ -59,6 +59,17 @@ export default function CompanyDashboard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+
+  const handleBoostMission = async (id: string) => {
+    try {
+      const res = await fetch(`/api/v1/missions/${id}/boost`, { method: "POST" })
+      if (!res.ok) throw new Error("Failed to boost mission")
+      fetchDashboardData()
+    } catch (e) {
+      alert("Error boosting mission")
+    }
+  }
+
   const handleCreateMission = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -211,9 +222,20 @@ export default function CompanyDashboard() {
                                     <span>{new Date(m.created_at).toLocaleDateString()}</span>
                                 </p>
                             </div>
-                            <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${m.status === 'OPEN' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}>
-                                {m.status}
-                            </span>
+                            <div className="flex items-center gap-3">
+                                {m.status === 'OPEN' && (
+                                    <button
+                                        onClick={() => handleBoostMission(m.id)}
+                                        className="text-xs px-3 py-1.5 rounded-full font-bold bg-orange-100 text-orange-700 border border-orange-200 hover:bg-orange-200 hover:text-orange-800 transition"
+                                        title="Surge Pricing by +20% to incentivize creators"
+                                    >
+                                        Boost (+20%)
+                                    </button>
+                                )}
+                                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${m.status === 'OPEN' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}>
+                                    {m.status}
+                                </span>
+                            </div>
                         </div>
                     ))
                 ) : <p className="text-sm text-gray-500 italic text-center py-4">No missions created yet.</p>}
