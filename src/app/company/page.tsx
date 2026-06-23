@@ -47,7 +47,7 @@ export default function CompanyDashboard() {
       if (keysRes.ok) setApiKeys(await keysRes.json())
       if (analyticsRes.ok) setAnalytics(await analyticsRes.json())
 
-    } catch (e) {
+    } catch {
         console.error(e)
     }
     setLoading(false)
@@ -65,7 +65,7 @@ export default function CompanyDashboard() {
       const res = await fetch(`/api/v1/missions/${id}/boost`, { method: "POST" })
       if (!res.ok) throw new Error("Failed to boost mission")
       fetchDashboardData()
-    } catch (e) {
+    } catch {
       alert("Error boosting mission")
     }
   }
