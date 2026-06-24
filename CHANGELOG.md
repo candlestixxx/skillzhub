@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.23
+- Implemented Edge Middleware for structural API Key validation and IP-based rate limiting to prevent aggressive bot traffic from reaching the Node.js event loop or database.
+
 ## v0.1.22
 - Integrated real FFmpeg subprocesses in `worker.ts` via `normalizeVideo` to transcode incoming video uploads to standard 1080p 30fps MP4.
 - Integrated `uploadLocalFileToS3` to persist the normalized file directly to AWS S3 prior to VLM auto-labeling.
