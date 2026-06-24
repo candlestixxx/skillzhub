@@ -29,6 +29,7 @@
 - [x] OpenAPI / Swagger documentation generation for `/api/v1/*`.
 
 ## Phase 6: Advanced Connectivity
+- [x] Implemented "Synthetic Data Upsell" feature allowing companies to request depth maps and segmentation masks for compiled datasets via the UI.
 - [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
 - [x] Bounty Boosts integration allowing companies to dynamically surge pricing by +20% for specific open missions via UI.
 
