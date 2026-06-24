@@ -1,10 +1,14 @@
 import { Worker } from 'bullmq'
 import Redis from 'ioredis'
 import { PrismaClient } from '@prisma/client'
-import { probeVideo, extractMetadata } from './src/lib/video-processor'
+import { probeVideo, extractMetadata, normalizeVideo } from './src/lib/video-processor'
 import { acceptSubmissionAndTriggerDownstream } from './src/lib/services/submissions'
 import { analyzeVideoWithVLM } from './src/lib/services/vlm-processor'
-import { generateDownloadUrl } from './src/lib/services/storage'
+import { generateDownloadUrl, uploadLocalFileToS3 } from './src/lib/services/storage'
+import os from 'os'
+import path from 'path'
+import crypto from 'crypto'
+import fs_promises from 'fs/promises'
 
 const prisma = new PrismaClient()
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
@@ -39,9 +43,47 @@ const worker = new Worker('video-processing', async job => {
         console.warn("ffprobe failed (is the URL accessible?), falling back to mock metadata.", probeError);
     }
 
+
     const isQCPass = width >= 1920 && fps >= 30
 
+    let finalStorageKey = rawStorageKey;
+
+    if (isQCPass && !process.env.TEST_ENV) {
+        console.log(`Attempting FFmpeg normalization for ${videoUrl}...`)
+        const tempDir = os.tmpdir();
+        const normalizedFileName = `normalized_${crypto.randomUUID()}.mp4`;
+        const normalizedFilePath = path.join(tempDir, normalizedFileName);
+
+        try {
+            await normalizeVideo(videoUrl, normalizedFilePath);
+            console.log(`Normalization complete. Uploading to S3...`);
+
+            finalStorageKey = `normalized/${normalizedFileName}`;
+
+            // Mock S3 upload if AWS keys aren't actually set
+            if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID !== "mock_access_key") {
+                await uploadLocalFileToS3(normalizedFilePath, finalStorageKey);
+                console.log(`Uploaded normalized video to S3 at ${finalStorageKey}`);
+            } else {
+                console.log(`AWS keys mocked. Skipping actual S3 upload. Pretending key is ${finalStorageKey}`);
+            }
+
+        } catch (normError) {
+            console.error(`Normalization failed:`, normError);
+            // Fall back to original key if normalization fails
+            finalStorageKey = rawStorageKey;
+        } finally {
+            // Cleanup local file
+            try {
+                await fs_promises.unlink(normalizedFilePath);
+            } catch (e) {
+                 // Ignore if file doesn't exist
+            }
+        }
+    }
+
     console.log(`Attempting VLM analysis for ${videoUrl}...`)
+
     const vlmLabels = await analyzeVideoWithVLM(videoUrl);
 
     // Update submission with extracted metadata and VLM labels
@@ -56,7 +98,7 @@ const worker = new Worker('video-processing', async job => {
             processing_status: isQCPass ? 'IN_REVIEW' : 'AUTO_QC_FAIL',
             auto_qc_report: { passed: isQCPass, checks: { resolution: true, fps: true } },
             labels_summary: vlmLabels,
-            normalized_storage_key: rawStorageKey
+            normalized_storage_key: finalStorageKey
         }
     })
 

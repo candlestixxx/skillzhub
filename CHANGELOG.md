@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.22
+- Integrated real FFmpeg subprocesses in `worker.ts` via `normalizeVideo` to transcode incoming video uploads to standard 1080p 30fps MP4.
+- Integrated `uploadLocalFileToS3` to persist the normalized file directly to AWS S3 prior to VLM auto-labeling.
+
 ## v0.1.21
 - Implemented "Synthetic Data Upsell" feature allowing companies to request depth maps and segmentation masks for compiled datasets via the UI.
 
