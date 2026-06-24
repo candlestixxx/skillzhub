@@ -7,4 +7,3 @@
 
 ## Product Features
 - **Creator Tiers:** Gamify the creator side with "Trust Tiers." High-trust creators bypass manual admin QC and go straight to dataset generation.
-- **Synthetic Data Upsell:** Offer companies a one-click button in the UI to generate depth maps or segmentation masks for purchased datasets for an extra fee.

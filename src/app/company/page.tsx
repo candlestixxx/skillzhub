@@ -70,6 +70,17 @@ export default function CompanyDashboard() {
     }
   }
 
+
+  const handleRequestSyntheticData = async (id: string) => {
+    try {
+      const res = await fetch(`/api/v1/datasets/${id}/upsell`, { method: "POST" })
+      if (!res.ok) throw new Error("Failed to request synthetic data")
+      fetchDashboardData()
+    } catch {
+      alert("Error requesting synthetic data")
+    }
+  }
+
   const handleCreateMission = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -295,10 +306,22 @@ export default function CompanyDashboard() {
                                 </div>
                             </div>
 
-                            <button onClick={() => window.location.href=`/api/v1/datasets/${d.id}/manifest`} className="w-full bg-white border-2 border-purple-600 text-purple-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-sm flex justify-center items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Download JSON Manifest
-                            </button>
+
+                            <div className="flex gap-2">
+                              <button onClick={() => window.location.href=`/api/v1/datasets/${d.id}/manifest`} className="flex-1 bg-white border-2 border-purple-600 text-purple-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-sm flex justify-center items-center gap-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                  Manifest
+                              </button>
+
+                              <button
+                                onClick={() => handleRequestSyntheticData(d.id)}
+                                disabled={d.synthetic_data_requested}
+                                className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm flex justify-center items-center gap-2 ${d.synthetic_data_requested ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'}`}
+                              >
+                                {d.synthetic_data_requested ? 'Requested' : 'Add Synthetic Data'}
+                              </button>
+                            </div>
+
                         </div>
                     ))
                 ) : (

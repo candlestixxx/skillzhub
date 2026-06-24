@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.21
+- Implemented "Synthetic Data Upsell" feature allowing companies to request depth maps and segmentation masks for compiled datasets via the UI.
+
 ## v0.1.20
 - Added a "Boost (+20%)" button to active OPEN missions in the Company Dashboard (`src/app/company/page.tsx`), enabling companies to dynamically surge pricing to incentivize creators.
 
