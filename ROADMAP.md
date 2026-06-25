@@ -34,6 +34,7 @@
 - [x] Bounty Boosts integration allowing companies to dynamically surge pricing by +20% for specific open missions via UI.
 
 ## Phase 5: Additional Deployment Polish
+- [x] Edge Functions: Moved API key validation and rate-limiting to Next.js edge networks (src/middleware.ts) to drastically reduce latency and DB load.
 - [x] Dockerfile explicitly written for the independent BullMQ `worker.ts` node process.
 - [x] Replaced generic video placeholders in the Admin QC UI with authorized AWS S3 presigned URLs.
 - [x] Refactored background worker logic into testable utilities (`src/lib/video-processor.ts`).
