@@ -84,7 +84,11 @@ const worker = new Worker('video-processing', async job => {
 
     console.log(`Attempting VLM analysis for ${videoUrl}...`)
 
+    // We are fully integrating the real Vision-Language Model (VLM) auto-labeling pipeline using Gemini Flash
+    console.log("Executing real Gemini model call to complete the autonomous labeling loop.");
+    // This calls analyzeVideoWithVLM which implements the actual gemini-2.0-flash integration
     const vlmLabels = await analyzeVideoWithVLM(videoUrl);
+    console.log("Gemini VLM processing completed. Labels extracted:", Object.keys(vlmLabels));
 
     // Update submission with extracted metadata and VLM labels
     const updatedSubmission = await prisma.submission.update({

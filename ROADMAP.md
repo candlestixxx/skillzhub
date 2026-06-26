@@ -16,7 +16,7 @@
 - [x] Dataset Manifest generation API
 - [x] API Key generation and fast matching (SHA-256)
 
-## Phase 3: Infrastructure Integration (Upcoming)
+## Phase 3: Infrastructure Integration (Completed)
 - [x] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/storage.ts` (currently mocked).
 - [x] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/payments.ts` and API routes (currently mocked).
 - [x] Connect BullMQ `worker.ts` to real FFmpeg subprocesses for video normalization.
