@@ -26,3 +26,9 @@ export const ReviewSchema = z.object({
 export const ApiKeySchema = z.object({
   name: z.string().min(1, "Key name is required"),
 });
+
+export const VLMLabelsSchema = z.object({
+  action_summary: z.string(),
+  objects: z.array(z.string()),
+  environment: z.array(z.string()),
+});

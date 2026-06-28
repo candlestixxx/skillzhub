@@ -5,6 +5,7 @@ import path from "path";
 import os from "os";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
+import { VLMLabelsSchema } from "../schemas";
 
 /**
  * Downloads a file from a URL to a temporary local path using streams
@@ -98,7 +99,8 @@ export async function analyzeVideoWithVLM(videoUrl: string): Promise<{ action_su
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
         if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
+            const parsed = JSON.parse(jsonMatch[0]);
+            return VLMLabelsSchema.parse(parsed);
         }
 
         throw new Error("Failed to parse JSON from Gemini response");
