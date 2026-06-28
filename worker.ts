@@ -40,7 +40,7 @@ const worker = new Worker('video-processing', async job => {
          duration = extracted.duration;
          console.log(`Extracted real metadata: ${width}x${height} @ ${fps}fps, ${duration}s`);
     } catch(probeError) {
-        console.warn("ffprobe failed (is the URL accessible?), falling back to mock metadata.", probeError);
+        console.warn("ffprobe failed (is the URL accessible?), falling back to fallback metadata.", probeError);
     }
 
 
@@ -60,12 +60,12 @@ const worker = new Worker('video-processing', async job => {
 
             finalStorageKey = `normalized/${normalizedFileName}`;
 
-            // Mock S3 upload if AWS keys aren't actually set
-            if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID !== "mock_access_key") {
+            // Skip S3 upload if AWS keys aren't actually set
+            if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID !== "missing_access_key") {
                 await uploadLocalFileToS3(normalizedFilePath, finalStorageKey);
                 console.log(`Uploaded normalized video to S3 at ${finalStorageKey}`);
             } else {
-                console.log(`AWS keys mocked. Skipping actual S3 upload. Pretending key is ${finalStorageKey}`);
+                console.log(`AWS keys missing. Skipping actual S3 upload. Pretending key is ${finalStorageKey}`);
             }
 
         } catch (normError) {

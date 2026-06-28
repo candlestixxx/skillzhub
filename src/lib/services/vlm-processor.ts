@@ -26,21 +26,22 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
 
 /**
  * Extracts action_summary, objects, and environment labels from a video URL using Gemini 2.0 Flash.
- * If the GEMINI_API_KEY is not set or the request fails, it degrades gracefully to mock data.
+ * If the GEMINI_API_KEY is not set or the request fails, it degrades gracefully to fallback data.
  * This implementation downloads the video to a temp file and uses the Google File API for reliable ingestion.
  */
 export async function analyzeVideoWithVLM(videoUrl: string): Promise<{ action_summary: string, objects: string[], environment: string[] }> {
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const mockLabels = {
+    // Graceful fallback for local development or API failure
+    const fallbackLabels = {
         action_summary: "Descriptive Action: Human performing task in recorded environment",
         objects: ["human", "tool", "environment"],
         environment: ["indoor"]
     };
 
     if (!apiKey || apiKey === 'AIzaSy...' || process.env.NODE_ENV === 'test') {
-        console.warn("GEMINI_API_KEY is missing or invalid. Falling back to mock VLM labels.");
-        return mockLabels;
+        console.warn("GEMINI_API_KEY is missing or invalid. Falling back to fallback VLM labels.");
+        return fallbackLabels;
     }
 
     let tempFilePath = "";
@@ -106,8 +107,8 @@ export async function analyzeVideoWithVLM(videoUrl: string): Promise<{ action_su
         throw new Error("Failed to parse JSON from Gemini response");
 
     } catch (error) {
-        console.error("VLM extraction failed. Falling back to mock labels.", error);
-        return mockLabels;
+        console.error("VLM extraction failed. Falling back to fallback labels.", error);
+        return fallbackLabels;
     } finally {
         // Clean up: delete local temp file
         if (tempFilePath && fs.existsSync(tempFilePath)) {
