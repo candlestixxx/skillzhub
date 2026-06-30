@@ -36,7 +36,7 @@ const worker = new Worker('video-processing', async job => {
          duration = extracted.duration;
          console.log(`Extracted real metadata: ${width}x${height} @ ${fps}fps, ${duration}s`);
     } catch(probeError) {
-        console.warn("ffprobe failed (is the URL accessible?), falling back to mock metadata.", probeError);
+        console.warn("ffprobe failed (is the URL accessible?), falling back to fallback metadata.", probeError);
     }
 
     const isQCPass = width >= 1920 && fps >= 30
