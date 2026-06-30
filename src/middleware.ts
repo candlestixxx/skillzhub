@@ -12,6 +12,13 @@ function structuralEdgeRateLimit(ip: string): boolean {
   const record = edgeRateLimitCache.get(ip);
   if (!record || now > record.resetAt) {
     edgeRateLimitCache.set(ip, { count: 1, resetAt: now + windowMs });
+
+    // Memory leak mitigation: cleanup old keys occasionally
+    if (Math.random() < 0.01) {
+        for (const [key, val] of edgeRateLimitCache.entries()) {
+            if (now > val.resetAt) edgeRateLimitCache.delete(key);
+        }
+    }
     return true;
   }
 
@@ -64,3 +71,17 @@ export default auth((req) => {
 
   return NextResponse.next()
 })
+
+// Specify paths that should bypass the middleware completely
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (images, icons)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}

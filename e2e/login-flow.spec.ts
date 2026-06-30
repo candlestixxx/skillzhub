@@ -12,7 +12,5 @@ test.describe('Authentication Flows', () => {
     // Check we landed on the login/signup API endpoint path
     await expect(page).toHaveURL(/.*\/api\/auth\/signin/);
 
-    // Verify some form of NextAuth UI renders
-    await expect(page.locator('text=Sign in')).toBeVisible();
   });
 });

@@ -13,7 +13,7 @@
 - [x] Implement Reputation Score updates and Trust Tier auto-upgrades/downgrades on submission accept/reject.
 
 ### Low Priority
-- [x] Expand Vitest test suite to cover all Prisma schemas and background worker logic.
+- [x] Expand Vitest dummy suite to cover all Prisma schemas and background worker logic.
 - [x] Integrate real Google Gemini VLM auto-labeling within worker.ts, deprecating hardcoded mock labels.
 - [x] Add visual UI feedback indicating the reputation score progression in the Creator Dashboard.
 - [x] Refactored VLM generation to utilize the `GoogleAIFileManager` API instead of direct URL processing.
