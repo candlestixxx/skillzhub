@@ -1,14 +1,10 @@
 import { Worker } from 'bullmq'
 import Redis from 'ioredis'
 import { PrismaClient } from '@prisma/client'
-import { probeVideo, extractMetadata, normalizeVideo } from './src/lib/video-processor'
+import { probeVideo, extractMetadata } from './src/lib/video-processor'
 import { acceptSubmissionAndTriggerDownstream } from './src/lib/services/submissions'
-import { analyzeVideoWithVLM } from './src/lib/services/vlm-processor'
-import { generateDownloadUrl, uploadLocalFileToS3 } from './src/lib/services/storage'
-import os from 'os'
-import path from 'path'
-import crypto from 'crypto'
-import fs_promises from 'fs/promises'
+import { analyzeVideoWithVLM } from './src/lib/services/vlm'
+import { generateDownloadUrl } from './src/lib/services/storage'
 
 const prisma = new PrismaClient()
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
@@ -40,55 +36,13 @@ const worker = new Worker('video-processing', async job => {
          duration = extracted.duration;
          console.log(`Extracted real metadata: ${width}x${height} @ ${fps}fps, ${duration}s`);
     } catch(probeError) {
-        console.warn("ffprobe failed (is the URL accessible?), falling back to fallback metadata.", probeError);
+        console.warn("ffprobe failed (is the URL accessible?), falling back to mock metadata.", probeError);
     }
-
 
     const isQCPass = width >= 1920 && fps >= 30
 
-    let finalStorageKey = rawStorageKey;
-
-    if (isQCPass && !process.env.TEST_ENV) {
-        console.log(`Attempting FFmpeg normalization for ${videoUrl}...`)
-        const tempDir = os.tmpdir();
-        const normalizedFileName = `normalized_${crypto.randomUUID()}.mp4`;
-        const normalizedFilePath = path.join(tempDir, normalizedFileName);
-
-        try {
-            await normalizeVideo(videoUrl, normalizedFilePath);
-            console.log(`Normalization complete. Uploading to S3...`);
-
-            finalStorageKey = `normalized/${normalizedFileName}`;
-
-            // Skip S3 upload if AWS keys aren't actually set
-            if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID !== "missing_access_key") {
-                await uploadLocalFileToS3(normalizedFilePath, finalStorageKey);
-                console.log(`Uploaded normalized video to S3 at ${finalStorageKey}`);
-            } else {
-                console.log(`AWS keys missing. Skipping actual S3 upload. Pretending key is ${finalStorageKey}`);
-            }
-
-        } catch (normError) {
-            console.error(`Normalization failed:`, normError);
-            // Fall back to original key if normalization fails
-            finalStorageKey = rawStorageKey;
-        } finally {
-            // Cleanup local file
-            try {
-                await fs_promises.unlink(normalizedFilePath);
-            } catch (e) {
-                 // Ignore if file doesn't exist
-            }
-        }
-    }
-
     console.log(`Attempting VLM analysis for ${videoUrl}...`)
-
-    // We are fully integrating the real Vision-Language Model (VLM) auto-labeling pipeline using Gemini Flash
-    console.log("Executing real Gemini model call to complete the autonomous labeling loop.");
-    // This calls analyzeVideoWithVLM which implements the actual gemini-2.0-flash integration
     const vlmLabels = await analyzeVideoWithVLM(videoUrl);
-    console.log("Gemini VLM processing completed. Labels extracted:", Object.keys(vlmLabels));
 
     // Update submission with extracted metadata and VLM labels
     const updatedSubmission = await prisma.submission.update({
@@ -102,7 +56,7 @@ const worker = new Worker('video-processing', async job => {
             processing_status: isQCPass ? 'IN_REVIEW' : 'AUTO_QC_FAIL',
             auto_qc_report: { passed: isQCPass, checks: { resolution: true, fps: true } },
             labels_summary: vlmLabels,
-            normalized_storage_key: finalStorageKey
+            normalized_storage_key: rawStorageKey
         }
     })
 

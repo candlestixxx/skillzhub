@@ -47,7 +47,7 @@ export default function CompanyDashboard() {
       if (keysRes.ok) setApiKeys(await keysRes.json())
       if (analyticsRes.ok) setAnalytics(await analyticsRes.json())
 
-    } catch {
+    } catch (e) {
         console.error(e)
     }
     setLoading(false)
@@ -58,28 +58,6 @@ export default function CompanyDashboard() {
      fetchDashboardData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-
-  const handleBoostMission = async (id: string) => {
-    try {
-      const res = await fetch(`/api/v1/missions/${id}/boost`, { method: "POST" })
-      if (!res.ok) throw new Error("Failed to boost mission")
-      fetchDashboardData()
-    } catch {
-      alert("Error boosting mission")
-    }
-  }
-
-
-  const handleRequestSyntheticData = async (id: string) => {
-    try {
-      const res = await fetch(`/api/v1/datasets/${id}/upsell`, { method: "POST" })
-      if (!res.ok) throw new Error("Failed to request synthetic data")
-      fetchDashboardData()
-    } catch {
-      alert("Error requesting synthetic data")
-    }
-  }
 
   const handleCreateMission = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -233,20 +211,9 @@ export default function CompanyDashboard() {
                                     <span>{new Date(m.created_at).toLocaleDateString()}</span>
                                 </p>
                             </div>
-                            <div className="flex items-center gap-3">
-                                {m.status === 'OPEN' && (
-                                    <button
-                                        onClick={() => handleBoostMission(m.id)}
-                                        className="text-xs px-3 py-1.5 rounded-full font-bold bg-orange-100 text-orange-700 border border-orange-200 hover:bg-orange-200 hover:text-orange-800 transition"
-                                        title="Surge Pricing by +20% to incentivize creators"
-                                    >
-                                        Boost (+20%)
-                                    </button>
-                                )}
-                                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${m.status === 'OPEN' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}>
-                                    {m.status}
-                                </span>
-                            </div>
+                            <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${m.status === 'OPEN' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-100 border-gray-200 text-gray-600'}`}>
+                                {m.status}
+                            </span>
                         </div>
                     ))
                 ) : <p className="text-sm text-gray-500 italic text-center py-4">No missions created yet.</p>}
@@ -306,22 +273,10 @@ export default function CompanyDashboard() {
                                 </div>
                             </div>
 
-
-                            <div className="flex gap-2">
-                              <button onClick={() => window.location.href=`/api/v1/datasets/${d.id}/manifest`} className="flex-1 bg-white border-2 border-purple-600 text-purple-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-sm flex justify-center items-center gap-2">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                  Manifest
-                              </button>
-
-                              <button
-                                onClick={() => handleRequestSyntheticData(d.id)}
-                                disabled={d.synthetic_data_requested}
-                                className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm flex justify-center items-center gap-2 ${d.synthetic_data_requested ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'}`}
-                              >
-                                {d.synthetic_data_requested ? 'Requested' : 'Add Synthetic Data'}
-                              </button>
-                            </div>
-
+                            <button onClick={() => window.location.href=`/api/v1/datasets/${d.id}/manifest`} className="w-full bg-white border-2 border-purple-600 text-purple-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition shadow-sm flex justify-center items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Download JSON Manifest
+                            </button>
                         </div>
                     ))
                 ) : (

@@ -138,7 +138,6 @@ model Dataset {
   status                 DatasetStatus      @default(DRAFT)
   total_duration_seconds Float              @default(0)
   label_coverage         Json?
-  synthetic_data_requested Boolean            @default(false)
   license_type           LicenseType
   price                  Float?
   created_at             DateTime           @default(now())

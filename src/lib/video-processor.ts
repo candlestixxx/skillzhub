@@ -48,29 +48,3 @@ export function extractMetadata(metadata: ffmpeg.FfprobeData): VideoMetadata {
 
     return { width, height, fps, duration };
 }
-
-/**
- * Normalizes a video using FFmpeg to 1080p, 30fps, MP4 format.
- * Streams the output to a local temporary file.
- */
-export function normalizeVideo(inputUrl: string, outputPath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        ffmpeg(inputUrl)
-            .outputOptions([
-                '-vf scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2',
-                '-r 30',
-                '-c:v libx264',
-                '-crf 23',
-                '-preset fast',
-                '-c:a aac',
-                '-b:a 128k'
-            ])
-            .save(outputPath)
-            .on('end', () => {
-                resolve(outputPath);
-            })
-            .on('error', (err) => {
-                reject(err);
-            });
-    });
-}

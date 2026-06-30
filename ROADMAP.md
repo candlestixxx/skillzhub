@@ -16,9 +16,9 @@
 - [x] Dataset Manifest generation API
 - [x] API Key generation and fast matching (SHA-256)
 
-## Phase 3: Infrastructure Integration (Completed)
-- [x] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/storage.ts`.
-- [x] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/payments.ts` and API routes.
+## Phase 3: Infrastructure Integration (Upcoming)
+- [x] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/storage.ts` (currently mocked).
+- [x] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/payments.ts` and API routes (currently mocked).
 - [x] Connect BullMQ `worker.ts` to real FFmpeg subprocesses for video normalization.
 - [x] Integrate a real Vision-Language Model (VLM) (e.g., Gemini Flash or Qwen-VL) into the worker for auto-labeling (action summary, object tags).
 
@@ -29,13 +29,11 @@
 - [x] OpenAPI / Swagger documentation generation for `/api/v1/*`.
 
 ## Phase 6: Advanced Connectivity
-- [x] Implemented "Synthetic Data Upsell" feature allowing companies to request depth maps and segmentation masks for compiled datasets via the UI.
 - [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
-- [x] Bounty Boosts integration allowing companies to dynamically surge pricing by +20% for specific open missions via UI.
 
 ## Phase 5: Additional Deployment Polish
-- [x] Edge Functions: Moved API key validation and rate-limiting to Next.js edge networks (src/middleware.ts) to drastically reduce latency and DB load.
 - [x] Dockerfile explicitly written for the independent BullMQ `worker.ts` node process.
 - [x] Replaced generic video placeholders in the Admin QC UI with authorized AWS S3 presigned URLs.
 - [x] Refactored background worker logic into testable utilities (`src/lib/video-processor.ts`).
 - [x] Expanded Vitest test suite to cover worker pure functions.
+- [ ] Stabilize local integration testing pipeline for Next.js and worker using robust Prisma test seeders.

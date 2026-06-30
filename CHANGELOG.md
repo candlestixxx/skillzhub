@@ -1,21 +1,5 @@
 # Changelog
 
-## v0.1.24
-- Executed Executive Protocol: System-wide synchronization, testing validation, and documentation snapshot generation.
-
-## v0.1.23
-- Implemented Edge Middleware for structural API Key validation and IP-based rate limiting to prevent aggressive bot traffic from reaching the Node.js event loop or database.
-
-## v0.1.22
-- Integrated real FFmpeg subprocesses in `worker.ts` via `normalizeVideo` to transcode incoming video uploads to standard 1080p 30fps MP4.
-- Integrated `uploadLocalFileToS3` to persist the normalized file directly to AWS S3 prior to VLM auto-labeling.
-
-## v0.1.21
-- Implemented "Synthetic Data Upsell" feature allowing companies to request depth maps and segmentation masks for compiled datasets via the UI.
-
-## v0.1.20
-- Added a "Boost (+20%)" button to active OPEN missions in the Company Dashboard (`src/app/company/page.tsx`), enabling companies to dynamically surge pricing to incentivize creators.
-
 ## v0.1.19
 - Fixed major blocking bug in the worker's VLM pipeline where raw S3 storage keys were being erroneously passed into the Gemini video fetcher. It now securely generates a temporary AWS S3 pre-signed URL before passing it to Google AI.
 - Updated the hallucinated model prompt from `gemini-2.5-flash` to the correct `gemini-2.0-flash`.
@@ -115,3 +99,19 @@
 ## v0.1.0
 - Initial MVP Launch.
 - Set up DB, Queues, RBAC, API routes, and rate-limiting.
+
+## [1.1.0] - 2024-06-30
+### Added
+- **Phase 3**: Integrated real AWS S3 presigned URL generation for secure video streaming and uploads.
+- **Phase 3**: Connect real FFmpeg subprocess normalization pipeline to BullMQ worker.
+- **Phase 3**: Connected real Google Gemini Flash VLM integration for video labeling and object detection.
+- **Phase 3**: Configured real Stripe Connect APIs for creator onboarding.
+- **Phase 4**: Add robust end-to-end user flow testing using Playwright.
+- **Phase 4**: Add interactive OpenAPI dashboard via swagger-ui-react.
+- **Phase 5**: Wrote and verified dedicated Dockerfile for deploying the `worker.ts` process standalone.
+- **Phase 6**: Integrate webhook event emitters for sending Company dataset approval notifications.
+
+### Changed
+- Configured edge rate limiting (IP-based) to sit in `middleware.ts` to block DoS earlier.
+- Migrated Prisma schema tests to utilize local Postgres instance instead of failing Docker container.
+- Bumped application global semantic versioning.

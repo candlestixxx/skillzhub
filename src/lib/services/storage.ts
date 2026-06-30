@@ -29,26 +29,3 @@ export async function generateDownloadUrl(key: string): Promise<string> {
 
   return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 }
-
-import fs from "fs";
-
-/**
- * Uploads a local file directly to S3. Used by the worker after FFmpeg normalization.
- */
-export async function uploadLocalFileToS3(localFilePath: string, key: string, contentType: string = "video/mp4"): Promise<void> {
-    const fileStream = fs.createReadStream(localFilePath);
-
-    const command = new PutObjectCommand({
-        Bucket: BUCKET_NAME,
-        Key: key,
-        Body: fileStream,
-        ContentType: contentType,
-    });
-
-    try {
-        await s3Client.send(command);
-    } catch (error) {
-        console.error(`Failed to upload ${localFilePath} to S3 at key ${key}`, error);
-        throw error;
-    }
-}
