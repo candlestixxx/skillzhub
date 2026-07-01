@@ -3,7 +3,7 @@ import Redis from 'ioredis'
 import { PrismaClient } from '@prisma/client'
 import { probeVideo, extractMetadata } from './src/lib/video-processor'
 import { acceptSubmissionAndTriggerDownstream } from './src/lib/services/submissions'
-import { analyzeVideoWithVLM } from './src/lib/services/vlm-processor'
+import { analyzeVideoWithVLM } from './src/lib/services/vlm'
 import { generateDownloadUrl } from './src/lib/services/storage'
 
 const prisma = new PrismaClient()
@@ -36,7 +36,7 @@ const worker = new Worker('video-processing', async job => {
          duration = extracted.duration;
          console.log(`Extracted real metadata: ${width}x${height} @ ${fps}fps, ${duration}s`);
     } catch(probeError) {
-        console.warn("ffprobe failed (is the URL accessible?), falling back to mock metadata.", probeError);
+        console.warn("ffprobe failed (is the URL accessible?), falling back to fallback metadata.", probeError);
     }
 
     const isQCPass = width >= 1920 && fps >= 30

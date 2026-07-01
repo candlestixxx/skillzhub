@@ -10,3 +10,9 @@
 
 ## Instructions for Next Model
 1. **Additional Features**: Review `ROADMAP.md` and `TODO.md` to identify missing features or backlog items, such as deep-diving into the `CompanyDashboard` UI/UX for Dataset Analytics, or further scaling improvements for the backend queue.
+
+## Handoff from Session 3
+* Attempted to test local Next.js + BullMQ pipeline per supervisor request.
+* Set up local Postgres and Redis natively inside bash session using `apt-get` due to docker limitations.
+* Found Prisma validation errors when attempting to seed data (e.g. `task_type`, `environment_type`, `price_per_minute` missing). Supervisor aborted session before test script passed.
+* Next task is to fix the `e2e_pipeline.ts` testing seed data by fulfilling all required Prisma schema fields, and successfully test the worker.

@@ -99,3 +99,19 @@
 ## v0.1.0
 - Initial MVP Launch.
 - Set up DB, Queues, RBAC, API routes, and rate-limiting.
+
+## [1.1.0] - 2024-06-30
+### Added
+- **Phase 3**: Integrated real AWS S3 presigned URL generation for secure video streaming and uploads.
+- **Phase 3**: Connect real FFmpeg subprocess normalization pipeline to BullMQ worker.
+- **Phase 3**: Connected real Google Gemini Flash VLM integration for video labeling and object detection.
+- **Phase 3**: Configured real Stripe Connect APIs for creator onboarding.
+- **Phase 4**: Add robust end-to-end user flow testing using Playwright.
+- **Phase 4**: Add interactive OpenAPI dashboard via swagger-ui-react.
+- **Phase 5**: Wrote and verified dedicated Dockerfile for deploying the `worker.ts` process standalone.
+- **Phase 6**: Integrate webhook event emitters for sending Company dataset approval notifications.
+
+### Changed
+- Configured edge rate limiting (IP-based) to sit in `middleware.ts` to block DoS earlier.
+- Migrated Prisma schema tests to utilize local Postgres instance instead of failing Docker container.
+- Bumped application global semantic versioning.
