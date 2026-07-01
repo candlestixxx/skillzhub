@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.20
+- Added comprehensive Vitest test suite for the VLM processor (`tests/vlm.test.ts`) covering fallback behavior, successful Gemini analysis, state polling, and JSON parse error recovery.
+- Merged `dependabot/npm_and_yarn/npm_and_yarn-7571c7a8dc`: Updated `form-data` from 4.0.5 to 4.0.6 and `ws` from 8.20.1 to 8.21.0 for security patch compliance.
+- Refined VLM processor documentation and cleaned up stale branch references across the repository.
+- Bumped global build version to v0.1.20.
+
 ## v0.1.19
 - Fixed major blocking bug in the worker's VLM pipeline where raw S3 storage keys were being erroneously passed into the Gemini video fetcher. It now securely generates a temporary AWS S3 pre-signed URL before passing it to Google AI.
 - Updated the hallucinated model prompt from `gemini-2.5-flash` to the correct `gemini-2.0-flash`.
@@ -100,18 +106,3 @@
 - Initial MVP Launch.
 - Set up DB, Queues, RBAC, API routes, and rate-limiting.
 
-## [1.1.0] - 2024-06-30
-### Added
-- **Phase 3**: Integrated real AWS S3 presigned URL generation for secure video streaming and uploads.
-- **Phase 3**: Connect real FFmpeg subprocess normalization pipeline to BullMQ worker.
-- **Phase 3**: Connected real Google Gemini Flash VLM integration for video labeling and object detection.
-- **Phase 3**: Configured real Stripe Connect APIs for creator onboarding.
-- **Phase 4**: Add robust end-to-end user flow testing using Playwright.
-- **Phase 4**: Add interactive OpenAPI dashboard via swagger-ui-react.
-- **Phase 5**: Wrote and verified dedicated Dockerfile for deploying the `worker.ts` process standalone.
-- **Phase 6**: Integrate webhook event emitters for sending Company dataset approval notifications.
-
-### Changed
-- Configured edge rate limiting (IP-based) to sit in `middleware.ts` to block DoS earlier.
-- Migrated Prisma schema tests to utilize local Postgres instance instead of failing Docker container.
-- Bumped application global semantic versioning.

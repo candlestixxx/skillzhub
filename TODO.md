@@ -16,5 +16,6 @@
 - [x] Integrate real Google Gemini VLM auto-labeling within worker.ts, deprecating hardcoded mock labels.
 - [x] Add visual UI feedback indicating the reputation score progression in the Creator Dashboard.
 - [x] Refactor VLM generation to utilize the `GoogleAIFileManager` API instead of direct URL processing.
+- [x] Add comprehensive Vitest tests for VLM processor (`tests/vlm.test.ts`) covering fallback paths, Gemini analysis, polling, and error states.
 - [ ] Fix `e2e_pipeline.ts` Prisma seeding by adding `price_per_minute` (and any other missing schema fields) to `prisma.mission.create`.
 - [ ] Successfully execute local e2e pipeline test to verify worker queues.
