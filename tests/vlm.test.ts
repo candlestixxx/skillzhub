@@ -157,8 +157,8 @@ describe('VLM Processor', () => {
 
         // Mock setTimeout to resolve immediately so test doesn't actually wait 5s
         vi.spyOn(global, 'setTimeout').mockImplementation((cb) => {
-            (cb as Function)();
-            return {} as any;
+            (cb as (...args: unknown[]) => void)();
+            return {} as unknown as ReturnType<typeof setTimeout>;
         });
 
         const result = await analyzeVideoWithVLM('http://example.com/video.mp4');

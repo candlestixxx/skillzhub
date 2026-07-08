@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.21
+- Added `generateSyntheticData` worker logic to `worker.ts` and `src/lib/services/synthetic-data.ts`.
+- Created robust DB-mocked test suite in `tests/e2e_pipeline.test.ts` to execute and verify the End-To-End worker logic pipeline.
+- Bumped global build version to v0.1.21.
+
 ## v0.1.20
 - Added comprehensive Vitest test suite for the VLM processor (`tests/vlm.test.ts`) covering fallback behavior, successful Gemini analysis, state polling, and JSON parse error recovery.
 - Merged `dependabot/npm_and_yarn/npm_and_yarn-7571c7a8dc`: Updated `form-data` from 4.0.5 to 4.0.6 and `ws` from 8.20.1 to 8.21.0 for security patch compliance.
