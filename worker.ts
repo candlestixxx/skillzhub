@@ -5,6 +5,7 @@ import { probeVideo, extractMetadata } from './src/lib/video-processor'
 import { acceptSubmissionAndTriggerDownstream } from './src/lib/services/submissions'
 import { analyzeVideoWithVLM } from './src/lib/services/vlm'
 import { generateDownloadUrl } from './src/lib/services/storage'
+import { generateSyntheticData } from './src/lib/services/synthetic-data'
 
 const prisma = new PrismaClient()
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
@@ -44,10 +45,14 @@ const worker = new Worker('video-processing', async job => {
     console.log(`Attempting VLM analysis for ${videoUrl}...`)
     const vlmLabels = await analyzeVideoWithVLM(videoUrl);
 
-    // Update submission with extracted metadata and VLM labels
+    console.log(`Attempting Synthetic Data Generation for ${submissionId}...`)
+    const syntheticData = await generateSyntheticData(vlmLabels, videoUrl);
+    console.log(`Generated Synthetic Data: ${JSON.stringify(syntheticData)}`)
+
+    // Update submission with extracted metadata, VLM labels and Synthetic Data
     const updatedSubmission = await prisma.submission.update({
         where: { id: submissionId },
-        include: { creator: true },
+        include: { creator: true, mission: true },
         data: {
             duration_seconds: duration,
             resolution_width: width,
@@ -55,7 +60,7 @@ const worker = new Worker('video-processing', async job => {
             fps: fps,
             processing_status: isQCPass ? 'IN_REVIEW' : 'AUTO_QC_FAIL',
             auto_qc_report: { passed: isQCPass, checks: { resolution: true, fps: true } },
-            labels_summary: vlmLabels,
+            labels_summary: { ...(vlmLabels && typeof vlmLabels === 'object' ? vlmLabels : {}), synthetic_data: syntheticData },
             normalized_storage_key: rawStorageKey
         }
     })
