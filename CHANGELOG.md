@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.22
+- Added `.github/workflows/ci.yml` GitHub Actions pipeline for automated continuous integration, satisfying cross-model instructions.
+- Bumped global build version to v0.1.22.
+
 ## v0.1.21
 - Added `generateSyntheticData` worker logic to `worker.ts` and `src/lib/services/synthetic-data.ts`.
 - Created robust DB-mocked test suite in `tests/e2e_pipeline.test.ts` to execute and verify the End-To-End worker logic pipeline.
