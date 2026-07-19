@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.23
+- Displayed a `✨ Synthetic Data` badge on the Company Dashboard next to Datasets that contain any generated synthetic data annotations.
+
 ## v0.1.22
 - Added `.github/workflows/ci.yml` GitHub Actions pipeline for automated continuous integration, satisfying cross-model instructions.
 - Bumped global build version to v0.1.22.

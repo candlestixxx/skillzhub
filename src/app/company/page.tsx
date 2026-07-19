@@ -257,7 +257,14 @@ export default function CompanyDashboard() {
                         <div key={d.id} className="border border-gray-200 p-5 rounded-xl hover:shadow-md transition bg-white relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
                             <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-bold text-lg text-gray-900 leading-tight pr-16">{d.title}</h3>
+                                <h3 className="font-bold text-lg text-gray-900 leading-tight pr-16">
+                                    {d.title}
+                                    {d.has_synthetic_data && (
+                                        <span className="ml-2 inline-flex items-center gap-1 bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs px-2 py-0.5 rounded-md font-medium align-middle">
+                                            ✨ Synthetic Data
+                                        </span>
+                                    )}
+                                </h3>
                                 <span className="absolute top-5 right-5 bg-purple-50 border border-purple-100 text-purple-700 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold">{d.status}</span>
                             </div>
                             <p className="text-sm text-gray-600 mb-5 line-clamp-2">{d.description}</p>
