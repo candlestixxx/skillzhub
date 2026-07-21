@@ -2,7 +2,7 @@
 import { vi } from 'vitest'
 
 // Mock environment variables
-process.env.NODE_ENV = 'test'
+Object.defineProperty(process.env, "NODE_ENV", { value: 'test', configurable: true });
 process.env.JWT_SECRET = 'test-secret'
 process.env.NEXTAUTH_URL = 'http://localhost'
 

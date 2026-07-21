@@ -15,7 +15,7 @@ describe('Rate Limit Utility', () => {
 
     it('enforces limit when not in test env and limit exceeded', async () => {
         const originalEnv = process.env.NODE_ENV;
-        process.env.NODE_ENV = 'production';
+        Object.defineProperty(process.env, "NODE_ENV", { value: 'production', configurable: true });
 
         // We mocked ioredis. Since we can't easily mock the chained methods exactly for a true integration test
         // without setting up a real redis server in the test runner, we will just ensure the function returns
@@ -25,6 +25,6 @@ describe('Rate Limit Utility', () => {
         const isAllowed = await rateLimit('prod-ip', 5, 3600)
         expect(isAllowed).toBe(true)
 
-        process.env.NODE_ENV = originalEnv;
+        Object.defineProperty(process.env, "NODE_ENV", { value: originalEnv, configurable: true });
     })
 })
