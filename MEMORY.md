@@ -11,5 +11,4 @@
 - **Creator First**: Prioritize features that reduce friction for creators, such as the "Trust Tier" system to automate acceptance for high-reputation users.
 
 ## Technical Debt / Known Constraints
-- **VLM Mocking**: The VLM processor currently uses a mock implementation. Transitioning to a real Gemini 2.0 Flash call is a high-priority roadmap item.
 - **Local Development**: Redis is a hard requirement for the application to function, even in development, due to its role in the job queue and rate limiting.

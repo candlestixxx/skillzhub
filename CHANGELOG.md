@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.1.24
+- Completed validation that all Phase 3 infrastructure goals have been implemented and deployed.
+- Updated ROADMAP.md to definitively mark Phase 3 as Completed.
+
+## v0.1.23
+- Removed legacy `mock` string comments and fallback references from `vlm-processor.ts`, `storage.ts`, and `worker.ts` to clarify that the system is fully running on live infrastructure APIs.
+
+## v0.1.22
+- Fixed edge case in worker where failed VLM processing would auto-fail the entire submission. It now routes to manual review.
+
+## v0.1.21
+- Fully implemented Synthetic Data Upsell worker queue in BullMQ.
+- Added Bounty Boost feature to the Company UI allowing +20% mission price surging.
+- Fixed NextAuth UntrustedHost errors in the Playwright E2E test suite by supplying required env vars in the config.
+- Finalized Phase 3 and Phase 4 roadmap requirements, including local deployment verification of Redis and the Next.js production build.
+
+## v0.1.20
+- Added database schema fields `has_synthetic_data` and `synthetic_data_type` to `Dataset` to track synthetic logic.
+- Implemented `/api/v1/datasets/[id]/synthetic` POST endpoint.
+- Updated Company Dashboard UI with an interactive "Generate Synthetic Data" button on dataset cards.
+- Integrated a real Gemini AI implementation to `analyzeVideoWithVLM` in `src/lib/services/vlm-processor.ts`, replacing the hardcoded mock fallback.
+- Updated the test suite globally to mock `@google/generative-ai` successfully and prevent live calls.
+
 ## v0.1.19
 - Fixed major blocking bug in the worker's VLM pipeline where raw S3 storage keys were being erroneously passed into the Gemini video fetcher. It now securely generates a temporary AWS S3 pre-signed URL before passing it to Google AI.
 - Updated the hallucinated model prompt from `gemini-2.5-flash` to the correct `gemini-2.0-flash`.

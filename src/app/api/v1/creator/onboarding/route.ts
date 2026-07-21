@@ -7,7 +7,7 @@ let stripeClient: Stripe | null = null;
 function getStripe() {
     if (!stripeClient && process.env.STRIPE_SECRET_KEY) {
         stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
-            apiVersion: '2025-01-27.acacia'
+            apiVersion: '2026-06-24.dahlia'
         });
     }
     return stripeClient;
