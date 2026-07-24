@@ -11,35 +11,31 @@ export async function GET() {
 
     const datasets = await prisma.dataset.findMany({
       where: { company_id: session.user.id },
-      include: {
-          _count: { select: { dataset_samples: true } },
-          dataset_samples: {
-              include: {
-                  submission: {
-                      select: { labels_summary: true }
-                  }
-              }
-          }
-      },
+      include: { _count: { select: { dataset_samples: true } } },
       orderBy: { created_at: 'desc' }
     })
 
-    const enrichedDatasets = datasets.map(dataset => {
-        // Check if any submission in the dataset contains synthetic data
-        const hasSyntheticData = dataset.dataset_samples.some(sample => {
-            const summary = sample.submission.labels_summary as Record<string, unknown> | null;
-            return summary && summary.synthetic_data != null;
-        });
+    // To prevent loading massive JSON payloads into Node memory for thousands of samples,
+    // we query specifically for datasets that contain synthetic data submissions.
+    const syntheticSamples = await prisma.datasetSample.findMany({
+        where: {
+            dataset_id: { in: datasets.map(d => d.id) },
+            submission: {
+                labels_summary: {
+                    path: ['synthetic_data'],
+                    not: 'null'
+                }
+            }
+        },
+        select: { dataset_id: true }
+    })
 
-        // Remove the heavy payload of all samples from the response, we just needed it for the flag
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { dataset_samples, ...rest } = dataset;
+    const syntheticDatasetIds = new Set(syntheticSamples.map(s => s.dataset_id))
 
-        return {
-            ...rest,
-            has_synthetic_data: hasSyntheticData
-        };
-    });
+    const enrichedDatasets = datasets.map(dataset => ({
+        ...dataset,
+        has_synthetic_data: syntheticDatasetIds.has(dataset.id)
+    }))
 
     return NextResponse.json(enrichedDatasets)
   } catch {

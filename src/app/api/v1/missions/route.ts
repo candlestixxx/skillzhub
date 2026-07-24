@@ -61,14 +61,6 @@ export async function GET(req: Request) {
  *                 type: string
  *               description:
  *                 type: string
- *               price_per_minute:
- *                 type: number
- *               task_type:
- *                 type: string
- *               environment_type:
- *                 type: string
- *               license_type:
- *                 type: string
  *     responses:
  *       201:
  *         description: Mission created successfully.
