@@ -140,6 +140,8 @@ model Dataset {
   label_coverage         Json?
   license_type           LicenseType
   price                  Float?
+  has_synthetic_data     Boolean            @default(false)
+  synthetic_data_type    String?
   created_at             DateTime           @default(now())
   updated_at             DateTime           @updatedAt
 

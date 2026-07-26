@@ -34,6 +34,6 @@ SkillzHub is a C2B marketplace for skilled GoPro and FPV footage used to train A
 
 ## Demo Walkthrough
 1. **Login:** Access `/api/auth/signin`. Use `admin@skillzhub.com` / `admin123`, `tesla@company.com` / `company123`, or `creator@example.com` / `creator123`.
-2. **Company Flow:** Login as company, visit `/company` to create missions and view datasets.
+2. **Company Flow:** Login as company, visit `/company` to create missions and view datasets. Note that when creating a mission via the API directly, the `environment_type` and `price_per_minute` fields are required.
 3. **Creator Flow:** Login as creator, visit `/creator` to view open missions and submit footage.
 4. **Admin Flow:** Login as admin, visit `/admin` to review submissions in the QC queue.

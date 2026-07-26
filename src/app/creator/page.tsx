@@ -43,6 +43,7 @@ export default function CreatorDashboard() {
   const [missions, setMissions] = useState([])
   const [submissions, setSubmissions] = useState([])
   const [profile, setProfile] = useState<any>(null)
+  const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [uploadingFor, setUploadingFor] = useState<string | null>(null)
 
@@ -68,6 +69,12 @@ export default function CreatorDashboard() {
       const subRes = await fetch('/api/v1/creator/submissions')
       if (subRes.ok) {
           setSubmissions(await subRes.json())
+      }
+
+      // Fetch leaderboard
+      const leadRes = await fetch('/api/v1/creators/leaderboard')
+      if (leadRes.ok) {
+          setLeaderboard(await leadRes.json())
       }
 
     } catch (e) {
@@ -157,10 +164,12 @@ export default function CreatorDashboard() {
           </div>
       </div>
 
-      {/* Submissions History Section */}
-      {submissions.length > 0 && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900">Your Recent Submissions</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+            {/* Submissions History Section */}
+            {submissions.length > 0 && (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h2 className="text-xl font-semibold mb-4 text-gray-900">Your Recent Submissions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {submissions.map((sub: any) => (
                     <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden flex flex-col bg-gray-50">
@@ -196,14 +205,14 @@ export default function CreatorDashboard() {
                         </div>
                     </div>
                 ))}
-            </div>
-          </div>
-      )}
+                </div>
+              </div>
+            )}
 
-      {/* Missions Board Section */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Available Missions</h2>
+            {/* Missions Board Section */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900">Available Missions</h2>
             <button onClick={fetchDashboardData} disabled={loading} className="text-blue-600 text-sm hover:underline disabled:opacity-50 font-medium">
                 {loading ? 'Refreshing...' : 'Refresh Board'}
             </button>
@@ -244,6 +253,45 @@ export default function CreatorDashboard() {
                <p className="text-xs text-gray-400 mt-2">Check back later for new opportunities.</p>
             </div>
           )}
+        </div>
+      </div>
+        </div>
+
+        <div className="space-y-8">
+            {/* Leaderboard Section */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-full">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">Top Creators</h2>
+                </div>
+
+                <div className="space-y-4">
+                {leaderboard.length > 0 ? (
+                    leaderboard.map((creator: any, index: number) => (
+                        <div key={creator.id} className={`p-4 rounded-xl flex items-center justify-between border ${index === 0 ? 'bg-yellow-50 border-yellow-200' : index === 1 ? 'bg-gray-50 border-gray-200' : index === 2 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
+                            <div className="flex items-center gap-4">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? 'bg-yellow-200 text-yellow-800' : index === 1 ? 'bg-gray-200 text-gray-800' : index === 2 ? 'bg-orange-200 text-orange-800' : 'bg-gray-100 text-gray-600'}`}>
+                                    #{index + 1}
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-gray-900">{creator.name || 'Anonymous'}</p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-xs text-gray-500">Rep: {creator.reputation_score}</span>
+                                        {creator.trust_tier === 'HIGH_TRUST' && (
+                                            <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">PRO</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm font-bold text-green-600">${creator.total_earnings.toFixed(2)}</p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-sm text-gray-500 italic text-center py-4">No creators on the leaderboard yet.</p>
+                )}
+                </div>
+            </div>
         </div>
       </div>
 

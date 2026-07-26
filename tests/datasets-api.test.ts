@@ -67,8 +67,8 @@ describe('Datasets Manifest API - API Key Auth', () => {
   })
 
   it('rejects access if API key invalid and no session', async () => {
-    vi.mocked(prisma.aPIKey.findFirst).mockResolvedValue(null)
-    vi.mocked(auth).mockResolvedValue(null) // no session fallback
+    vi.mocked(prisma.aPIKey.findFirst).mockResolvedValue(null as any)
+    vi.mocked(auth).mockResolvedValue(null as any) // no session fallback
 
     const req = new NextRequest('http://localhost/api/v1/datasets/ds-1/manifest', {
         headers: {

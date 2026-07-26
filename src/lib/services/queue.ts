@@ -33,3 +33,17 @@ export const processingQueue = new Proxy({} as Queue, {
         return val;
     }
 });
+
+let syntheticQueueInstance: Queue | null = null;
+export const syntheticQueue = new Proxy({} as Queue, {
+    get: (target, prop) => {
+        if (!syntheticQueueInstance) {
+             syntheticQueueInstance = new Queue('synthetic-data', { connection: getConnection() });
+        }
+        const val = syntheticQueueInstance[prop as keyof Queue];
+        if (typeof val === 'function') {
+             return val.bind(syntheticQueueInstance);
+        }
+        return val;
+    }
+});

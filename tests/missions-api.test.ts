@@ -25,7 +25,7 @@ describe('Missions API', () => {
   })
 
   it('rejects unauthenticated requests', async () => {
-    vi.mocked(auth).mockResolvedValue(null)
+    vi.mocked(auth).mockResolvedValue(null as any)
     const req = new NextRequest('http://localhost/api/v1/missions', { method: 'POST' })
     const res = await CreateMission(req)
     expect(res.status).toBe(403)

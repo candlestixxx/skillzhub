@@ -100,6 +100,8 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         title: dataset.title,
         license_type: dataset.license_type,
         total_duration: dataset.total_duration_seconds,
+        has_synthetic_data: dataset.has_synthetic_data,
+        synthetic_data_type: dataset.synthetic_data_type,
         samples
     }
 

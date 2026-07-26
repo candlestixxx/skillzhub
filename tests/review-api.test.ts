@@ -39,7 +39,7 @@ describe('Admin Review API', () => {
   })
 
   it('rejects unauthenticated requests', async () => {
-    vi.mocked(auth).mockResolvedValue(null)
+    vi.mocked(auth).mockResolvedValue(null as any)
     const req = new NextRequest('http://localhost/api/v1/admin/submissions/1/review', { method: 'POST' })
     const res = await ReviewSubmission(req, { params: Promise.resolve({ id: '1' }) })
     expect(res.status).toBe(403)
@@ -72,7 +72,7 @@ describe('Admin Review API', () => {
         duration_seconds: 120
     } as any)
 
-    vi.mocked(prisma.dataset.findFirst).mockResolvedValue(null)
+    vi.mocked(prisma.dataset.findFirst).mockResolvedValue(null as any)
     vi.mocked(prisma.dataset.create).mockResolvedValue({ id: 'ds-1' } as any)
 
     const req = new NextRequest('http://localhost/api/v1/admin/submissions/1/review', {
