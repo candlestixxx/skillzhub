@@ -4,19 +4,20 @@
 - Displayed a `✨ Synthetic Data` badge on the Company Dashboard next to Datasets that contain any generated synthetic data annotations.
 
 ## v0.1.22
-- Added `.github/workflows/ci.yml` GitHub Actions pipeline for automated continuous integration, satisfying cross-model instructions.
-- Bumped global build version to v0.1.22.
+- Fixed edge case in worker where failed VLM processing would auto-fail the entire submission. It now routes to manual review.
 
 ## v0.1.21
-- Added `generateSyntheticData` worker logic to `worker.ts` and `src/lib/services/synthetic-data.ts`.
-- Created robust DB-mocked test suite in `tests/e2e_pipeline.test.ts` to execute and verify the End-To-End worker logic pipeline.
-- Bumped global build version to v0.1.21.
+- Fully implemented Synthetic Data Upsell worker queue in BullMQ.
+- Added Bounty Boost feature to the Company UI allowing +20% mission price surging.
+- Fixed NextAuth UntrustedHost errors in the Playwright E2E test suite by supplying required env vars in the config.
+- Finalized Phase 3 and Phase 4 roadmap requirements, including local deployment verification of Redis and the Next.js production build.
 
 ## v0.1.20
-- Added comprehensive Vitest test suite for the VLM processor (`tests/vlm.test.ts`) covering fallback behavior, successful Gemini analysis, state polling, and JSON parse error recovery.
-- Merged `dependabot/npm_and_yarn/npm_and_yarn-7571c7a8dc`: Updated `form-data` from 4.0.5 to 4.0.6 and `ws` from 8.20.1 to 8.21.0 for security patch compliance.
-- Refined VLM processor documentation and cleaned up stale branch references across the repository.
-- Bumped global build version to v0.1.20.
+- Added database schema fields `has_synthetic_data` and `synthetic_data_type` to `Dataset` to track synthetic logic.
+- Implemented `/api/v1/datasets/[id]/synthetic` POST endpoint.
+- Updated Company Dashboard UI with an interactive "Generate Synthetic Data" button on dataset cards.
+- Integrated a real Gemini AI implementation to `analyzeVideoWithVLM` in `src/lib/services/vlm-processor.ts`, replacing the hardcoded mock fallback.
+- Updated the test suite globally to mock `@google/generative-ai` successfully and prevent live calls.
 
 ## v0.1.19
 - Fixed major blocking bug in the worker's VLM pipeline where raw S3 storage keys were being erroneously passed into the Gemini video fetcher. It now securely generates a temporary AWS S3 pre-signed URL before passing it to Google AI.
@@ -117,4 +118,3 @@
 ## v0.1.0
 - Initial MVP Launch.
 - Set up DB, Queues, RBAC, API routes, and rate-limiting.
-
