@@ -16,9 +16,9 @@
 - [x] Dataset Manifest generation API
 - [x] API Key generation and fast matching (SHA-256)
 
-## Phase 3: Infrastructure Integration (Completed)
-- [x] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/storage.ts` .
-- [x] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/payments.ts` and API routes .
+## Phase 3: Infrastructure Integration (Upcoming)
+- [x] Implement actual AWS S3 / Cloudflare R2 presigned URLs in `src/lib/services/storage.ts`.
+- [x] Implement actual Stripe Connect onboarding, account creation, and ledger transfers in `src/lib/services/payments.ts` and API routes.
 - [x] Connect BullMQ `worker.ts` to real FFmpeg subprocesses for video normalization.
 - [x] Integrate a real Vision-Language Model (VLM) (e.g., Gemini Flash or Qwen-VL) into the worker for auto-labeling (action summary, object tags).
 
@@ -28,11 +28,12 @@
 - [x] Improve Dataset Analytics dashboard with deeper aggregations.
 - [x] OpenAPI / Swagger documentation generation for `/api/v1/*`.
 
-## Phase 6: Advanced Connectivity
-- [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
-
 ## Phase 5: Additional Deployment Polish
 - [x] Dockerfile explicitly written for the independent BullMQ `worker.ts` node process.
 - [x] Replaced generic video placeholders in the Admin QC UI with authorized AWS S3 presigned URLs.
 - [x] Refactored background worker logic into testable utilities (`src/lib/video-processor.ts`).
 - [x] Expanded Vitest test suite to cover worker pure functions.
+- [x] Added VLM processor unit tests (`tests/vlm.test.ts`) covering fallback, success, polling, and error recovery.
+
+## Phase 6: Advanced Connectivity
+- [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
