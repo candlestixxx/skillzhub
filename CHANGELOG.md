@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.25
+- Outlined expansive architectural and product pivots inside `IDEAS.md` for future model scaling.
+- Bumped global build version to v0.1.25.
+
 ## v0.1.24
 - Extended synthetic data generation pipelines in `worker.ts` via Gemini 2.0 Flash to proactively structure necessary augmentation logic based on VLM-extracted video labels.
 - Optimized API query speeds inside `/api/v1/company/datasets` endpoint by preventing massive JSON string allocations in Node.js heap via raw Prisma ID selection loops.
