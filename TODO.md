@@ -19,3 +19,7 @@
 - [x] Add comprehensive Vitest tests for VLM processor (`tests/vlm.test.ts`) covering fallback paths, Gemini analysis, polling, and error states.
 - [x] Fix `e2e_pipeline.ts` Prisma seeding by adding `price_per_minute` (and any other missing schema fields) to `prisma.mission.create`.
 - [x] Successfully execute local e2e pipeline test to verify worker queues.
+
+### Phase 8 Preparation
+- [ ] Create a proof-of-concept `main.go` file inside a new `worker-go` directory demonstrating basic Redis connection and queue polling logic to replace BullMQ.
+- [ ] Research WebRTC streaming libraries compatible with Next.js App Router for live mission ingestions.

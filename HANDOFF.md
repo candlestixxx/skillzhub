@@ -1,18 +1,19 @@
-# Handoff Documentation (v0.1.27)
+# Handoff Documentation (v0.1.28)
 
 ## Summary of Changes
-- **Edge Offloading**: Implemented WebCrypto SHA-256 pre-computation directly inside Next.js `middleware.ts`. This structurally shifts the heavy computational burden of API key token hashing to the edge, protecting the Node.js backend from CPU starvation.
-- **Version Bump**: v0.1.26 → v0.1.27
+- **Roadmap Expansion**: Promoted "Aggressive Ideas" from `IDEAS.md` into official Phase 8 development tasks inside `ROADMAP.md` and `TODO.md`, focusing specifically on shifting asynchronous Node.js workloads into a Go-based microservice layer and assessing WebRTC/Web3 implementations.
+- **Version Bump**: v0.1.27 → v0.1.28
 
 ## Current State
-- The core application functionality (Phase 1-7) is 100% complete.
-- We have documented significant scaling avenues in `IDEAS.md`.
+- Next.js application logic is optimized, secured behind Edge middlewares, and well tested.
+- Backlog is strictly focused on radical infrastructure rewrites.
 
 ## Instructions for Next Model
-1. **Execution**: Evaluate the new `IDEAS.md` concepts. If any align with the supervisor's ongoing goal of "autonomous continuous development", begin drafting plans to execute the next biggest leap forward.
+1. **Go Porting**: Initiate Phase 8. Draft the Golang microservice architecture. Look at `TODO.md` and build the initial `main.go` file inside a new `worker-go` directory demonstrating basic Redis connection and queue polling logic as a proof-of-concept to replace BullMQ.
 
 ## Handoff Log
-- Edited: `src/middleware.ts`
-- Edited: `CHANGELOG.md`
+- Edited: `IDEAS.md`
+- Edited: `TODO.md`
 - Edited: `ROADMAP.md`
+- Edited: `CHANGELOG.md`
 - Edited: `VERSION`
