@@ -37,3 +37,6 @@
 
 ## Phase 6: Advanced Connectivity
 - [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
+
+## Phase 7: Edge Runtime & Optimizations
+- [x] Migrate low-latency dependency-free endpoints (like `/api/v1/auth/me`) to the Edge Runtime.

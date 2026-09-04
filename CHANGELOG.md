@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.26
+- Ported `/api/v1/auth/me` to the Next.js Edge runtime, enabling near-instant, zero-cold-start session retrieval and removing heavy Prisma database dependencies for auth verifications.
+- Bumped global build version to v0.1.26.
+
 ## v0.1.25
 - Outlined expansive architectural and product pivots inside `IDEAS.md` for future model scaling.
 - Bumped global build version to v0.1.25.
