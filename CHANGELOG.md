@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.27
+- Refactored authentication API key parsing into Next.js Edge `middleware.ts`. Leveraging the WebCrypto API, incoming `sk_...` Bearer tokens are now securely hashed (`SHA-256`) globally at the edge before hitting Node.js pipelines, drastically lowering computational latency on high-throughput backend DB instances.
+- Bumped global build version to v0.1.27.
+
 ## v0.1.26
 - Ported `/api/v1/auth/me` to the Next.js Edge runtime, enabling near-instant, zero-cold-start session retrieval and removing heavy Prisma database dependencies for auth verifications.
 - Bumped global build version to v0.1.26.

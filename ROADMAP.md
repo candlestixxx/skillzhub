@@ -40,3 +40,4 @@
 
 ## Phase 7: Edge Runtime & Optimizations
 - [x] Migrate low-latency dependency-free endpoints (like `/api/v1/auth/me`) to the Edge Runtime.
+- [x] Offload compute-heavy hash tasks (e.g. SHA-256 API Key verification layers) to Next.js Edge Middleware via WebCrypto.
