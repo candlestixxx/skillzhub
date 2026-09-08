@@ -37,3 +37,12 @@
 
 ## Phase 6: Advanced Connectivity
 - [x] Integrate Company Webhooks allowing programmatic notification when dataset samples are approved.
+
+## Phase 7: Edge Runtime & Optimizations
+- [x] Migrate low-latency dependency-free endpoints (like `/api/v1/auth/me`) to the Edge Runtime.
+- [x] Offload compute-heavy hash tasks (e.g. SHA-256 API Key verification layers) to Next.js Edge Middleware via WebCrypto.
+
+## Phase 8: Language Porting & Decentralization (Planning)
+- [ ] Investigate extracting the Node.js `worker.ts` logic into a high-performance Go or Rust microservice.
+- [ ] Evaluate real-time WebRTC ingest capabilities to replace asynchronous upload constraints.
+- [ ] Draft specifications for Web3 dataset micro-tokenization.
