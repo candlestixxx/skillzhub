@@ -1,19 +1,18 @@
-# Handoff Documentation (v0.1.28)
+# Handoff Documentation (v0.1.30)
 
 ## Summary of Changes
-- **Roadmap Expansion**: Promoted "Aggressive Ideas" from `IDEAS.md` into official Phase 8 development tasks inside `ROADMAP.md` and `TODO.md`, focusing specifically on shifting asynchronous Node.js workloads into a Go-based microservice layer and assessing WebRTC/Web3 implementations.
-- **Version Bump**: v0.1.27 → v0.1.28
+- **Go Video Extraction**: We successfully replicated the `src/lib/video-processor.ts` codebase logic natively into Golang. `worker-go/video.go` now handles strict struct unmarshaling from `os/exec` ffprobe child processes perfectly mapping the same metadata payload structures across application runtimes.
+- **Version Bump**: v0.1.29 → v0.1.30
 
 ## Current State
-- Next.js application logic is optimized, secured behind Edge middlewares, and well tested.
-- Backlog is strictly focused on radical infrastructure rewrites.
+- Phase 8 development is advancing.
+- The Go executable handles queue polling simulations and binary execution extraction out-of-the-box.
 
 ## Instructions for Next Model
-1. **Go Porting**: Initiate Phase 8. Draft the Golang microservice architecture. Look at `TODO.md` and build the initial `main.go` file inside a new `worker-go` directory demonstrating basic Redis connection and queue polling logic as a proof-of-concept to replace BullMQ.
+1. **Gemini & Prisma Migrations**: Since Go lacks Prisma's ORM mappings naturally, we need to map a connection strategy to Postgres via raw SQL or `pgx`. Additionally, look into integrating the Google Gemini VLM API to completely port over all of `worker.ts`.
 
 ## Handoff Log
-- Edited: `IDEAS.md`
-- Edited: `TODO.md`
-- Edited: `ROADMAP.md`
+- Edited: `worker-go/main.go`
+- Created: `worker-go/video.go`
 - Edited: `CHANGELOG.md`
 - Edited: `VERSION`

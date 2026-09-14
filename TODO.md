@@ -21,5 +21,5 @@
 - [x] Successfully execute local e2e pipeline test to verify worker queues.
 
 ### Phase 8 Preparation
-- [ ] Create a proof-of-concept `main.go` file inside a new `worker-go` directory demonstrating basic Redis connection and queue polling logic to replace BullMQ.
+- [x] Create a proof-of-concept `main.go` file inside a new `worker-go` directory demonstrating basic Redis connection and queue polling logic to replace BullMQ.
 - [ ] Research WebRTC streaming libraries compatible with Next.js App Router for live mission ingestions.

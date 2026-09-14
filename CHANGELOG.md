@@ -1,8 +1,12 @@
 # Changelog
 
-## v0.1.28
-- Established Phase 8 requirements targeting Go language porting, WebRTC streaming, and Web3 decentralization for the autonomous data pipeline logic.
-- Bumped global build version to v0.1.28.
+## v0.1.30
+- Ported the Next.js/Node.js `fluent-ffmpeg` wrapper extraction capabilities over into pure Golang (`worker-go/video.go`), establishing real sub-process FFprobe unmarshaling streams natively.
+- Bumped global build version to v0.1.30.
+
+## v0.1.29
+- Scoped and successfully initialized a Golang proof-of-concept queue worker (`worker-go`) configured to connect directly to the Redis streaming environment, officially beginning the Phase 8 architecture paradigm shift away from Next.js server limits.
+- Bumped global build version to v0.1.29.
 
 ## v0.1.27
 - Refactored authentication API key parsing into Next.js Edge `middleware.ts`. Leveraging the WebCrypto API, incoming `sk_...` Bearer tokens are now securely hashed (`SHA-256`) globally at the edge before hitting Node.js pipelines, drastically lowering computational latency on high-throughput backend DB instances.
