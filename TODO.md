@@ -22,4 +22,4 @@
 
 ### Phase 8 Preparation
 - [x] Create a proof-of-concept `main.go` file inside a new `worker-go` directory demonstrating basic Redis connection and queue polling logic to replace BullMQ.
-- [ ] Research WebRTC streaming libraries compatible with Next.js App Router for live mission ingestions.
+- [x] Research WebRTC streaming libraries compatible with Next.js App Router for live mission ingestions.
