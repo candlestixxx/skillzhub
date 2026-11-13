@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.31
+- Researched and documented WebRTC integration strategies for Go backend ingest via `pion/webrtc`, completing Phase 8 technical preparation.
+- Bumped global build version to v0.1.31.
+
 ## v0.1.30
 - Ported the Next.js/Node.js `fluent-ffmpeg` wrapper extraction capabilities over into pure Golang (`worker-go/video.go`), establishing real sub-process FFprobe unmarshaling streams natively.
 - Bumped global build version to v0.1.30.

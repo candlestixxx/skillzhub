@@ -1,18 +1,18 @@
-# Handoff Documentation (v0.1.30)
+# Handoff Documentation (v0.1.31)
 
 ## Summary of Changes
-- **Go Video Extraction**: We successfully replicated the `src/lib/video-processor.ts` codebase logic natively into Golang. `worker-go/video.go` now handles strict struct unmarshaling from `os/exec` ffprobe child processes perfectly mapping the same metadata payload structures across application runtimes.
-- **Version Bump**: v0.1.29 → v0.1.30
+- **WebRTC Architectural Research**: Finalized Phase 8 conceptualizations by verifying `pion/webrtc` as the ideal candidate for the `worker-go` ingestion microservice, drafting `webrtc_research.md` to define the blueprint for transitioning the React app away from asynchronous uploads.
+- **Version Bump**: v0.1.30 → v0.1.31
 
 ## Current State
-- Phase 8 development is advancing.
-- The Go executable handles queue polling simulations and binary execution extraction out-of-the-box.
+- Phase 8 planning and discovery is 100% complete.
+- We have fully mapped out the Go architecture, video extraction parity, and streaming library recommendations.
 
 ## Instructions for Next Model
-1. **Gemini & Prisma Migrations**: Since Go lacks Prisma's ORM mappings naturally, we need to map a connection strategy to Postgres via raw SQL or `pgx`. Additionally, look into integrating the Google Gemini VLM API to completely port over all of `worker.ts`.
+1. **Execution via Go**: Review `worker-go/webrtc_research.md`. Begin implementing the WebRTC signaling logic inside the Go app if aligned with user objectives, or finalize the Gemini & Postgres mappings requested previously to close out the remaining backend feature-parity with Node.js.
 
 ## Handoff Log
-- Edited: `worker-go/main.go`
-- Created: `worker-go/video.go`
+- Created: `worker-go/webrtc_research.md`
+- Edited: `TODO.md`
 - Edited: `CHANGELOG.md`
 - Edited: `VERSION`
